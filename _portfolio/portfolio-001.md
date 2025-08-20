@@ -12,7 +12,7 @@ category: Research Projects
 <img src='/images/portfolio/flow_matching.png'>
 
 
-This is a library I have developped during my internship at Télécom Paris, under the supervision of Yann Gousseau, Alasdair Newson and Andrés Almansa. It implements everything needed to do basic Flow Matching, and is based on the equations in the paper "Flow Matching Guide and Code" ([arxiv][https://arxiv.org/pdf/2412.06264]) by Meta. To be more precise, it implements:
+This is a library I have developped during my internship at Télécom Paris, under the supervision of Yann Gousseau, Alasdair Newson and Andrés Almansa. It implements everything needed to do basic Flow Matching, and is based on the equations in the paper "Flow Matching Guide and Code" [arxiv][https://arxiv.org/pdf/2412.06264] by Meta. To be more precise, it implements:
 - Basic FM using specified schedulers and an affine path
 - Classifier-Guided FM
 - Classifier-free guidance
