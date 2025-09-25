@@ -1,6 +1,6 @@
 ---
-title: "My Flow Matching Library"
-excerpt: "<img src='/images/portfolio/flow_matching.png'>"
+title: "Fast Video Inpainting on a Budget"
+excerpt: "<img src='/images/portfolio/teaser.gif'>"
 collection: portfolio
 category: Research Projects
 ---
