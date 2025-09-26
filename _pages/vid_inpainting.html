@@ -104,28 +104,20 @@ custom_css: /assets/css/style_paper.css
  </div>
 
 
- <div class="row" style="text-align:center; margin-top:1.5rem;">
+<div class="row" style="text-align:center; margin-top:1.5rem;">
   <div class="col-xs-12">
-    <!-- Container: the script auto-initializes .ba blocks -->
     <div class="ba" data-ba-initial="0.5" aria-label="Before / After video comparison" style="max-width:960px; margin:0 auto;">
       <div class="frame">
-        <!-- BEFORE (left) -->
         <div class="layer before">
-          <video data-ba-before playsinline controls preload="metadata" style="width:100%; height:100%;">
+          <video id="videoBefore" data-ba-before playsinline muted loop preload="auto" style="width:100%; height:100%;">
             <source src="/files/misc/FM2FVi/gt_chatelet.mp4" type="video/mp4">
-            Your browser does not support the video tag.
           </video>
         </div>
-
-        <!-- AFTER (right) -->
         <div class="layer after">
-          <video data-ba-after playsinline controls preload="metadata" style="width:100%; height:100%;">
-            <source src="/files/misc/FM2FVi/_chatelet_16.mp4" type="video/mp4">
-            Your browser does not support the video tag.
+          <video id="videoAfter" data-ba-after playsinline muted loop preload="auto" style="width:100%; height:100%;">
+            <source src="/files/misc/FM2FVi/mchatelet_16.mp4" type="video/mp4">
           </video>
         </div>
-
-        <!-- draggable handle -->
         <div class="handle" role="slider" aria-label="Comparison handle" aria-valuemin="0" aria-valuemax="100">
           <div class="knob" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -134,19 +126,37 @@ custom_css: /assets/css/style_paper.css
             </svg>
           </div>
         </div>
-
         <div class="label before">Original</div>
         <div class="label after">Inpainted</div>
-      </div>
-
-      <!-- optional small controls / tip area -->
-      <div class="controls" style="max-width:960px; margin:8px auto 0; padding:0 10px;">
-        <div>Tip: use WebM/MP4 instead of GIFs for accurate scrubbing & sync.</div>
-        <div><small style="color:#666;">Initial split: 50%</small></div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+const vidBefore = document.getElementById('videoBefore');
+const vidAfter = document.getElementById('videoAfter');
+
+function playVideos() {
+  vidBefore.muted = true;
+  vidAfter.muted = true;
+  Promise.all([vidBefore.play(), vidAfter.play()]).catch(e => {});
+}
+
+// Smooth sync function
+function syncVideos() {
+  const diff = vidBefore.currentTime - vidAfter.currentTime;
+  if (Math.abs(diff) > 0.3) { // only correct if off by more than 0.3s
+    vidAfter.currentTime = vidBefore.currentTime;
+  }
+  requestAnimationFrame(syncVideos);
+}
+
+window.addEventListener('load', () => {
+  playVideos();
+  requestAnimationFrame(syncVideos);
+});
+</script>
 
 
  <div class="row" style="padding:2rem">

@@ -1,6 +1,6 @@
 ---
 title: "Fast Video Inpainting on a Budget"
-excerpt: "<img src='/images/portfolio/teaser.gif'>"
+excerpt: "<img src='/files/portfolio/video_inpainting/teaser.gif'>"
 collection: portfolio
 category: Research Projects
 ---
