@@ -1,12 +1,8 @@
 ---
-title: "Flow Matching Library"
+title: "Fast Video Inpainting on a Budget"
+excerpt: "<img src='/files/portfolio/video_inpainting/teaser.gif'>"
 collection: portfolio
 category: Research Projects
-date: 2025-06-01
-header:
-  teaser: "/images/portfolio/flow_matching_teaser.gif"
-excerpt: "A PyTorch Lightning library for Flow Matching with classifier-free guidance."
-paperurl: "https://arxiv.org/pdf/2412.06264"
 ---
 
 * __Ressources__: [GitHub](https://github.com/mathis-wauquiez/FlowMatchingLibrary)
