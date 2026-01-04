@@ -1,8 +1,11 @@
 ---
-title: "Fast Video Inpainting on a Budget"
-excerpt: "<img src='/files/portfolio/video_inpainting/teaser.gif'>"
+title: "FM²FVI: Fast Video Inpainting"
+excerpt: "Flow Matching approach for efficient multi-frame video inpainting."
 collection: portfolio
 category: Research Projects
+header:
+  teaser: "/images/portfolio/teaser.gif"
+link: /papers/vid_inpainting/
 ---
 
 * __Ressources__: [GitHub](https://github.com/mathis-wauquiez/FlowMatchingLibrary)
