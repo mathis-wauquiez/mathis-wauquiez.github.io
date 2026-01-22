@@ -4,6 +4,6 @@ excerpt: "Flow Matching approach for efficient multi-frame video inpainting."
 collection: portfolio
 category: Research Projects
 header:
-  teaser: "/images/portfolio/teaser.gif"
+  teaser: "fm2fvi_demo.gif"
 link: /papers/vid_inpainting/
 ---
