@@ -403,7 +403,7 @@
     if (!on && fxNameEl) fxNameEl.hidden = true;
     toast(on ? 'Transition names: shown (N)' : 'Transition names: hidden');
   }
-  const FX_CAP = 2400;   // ms: a longer effect plays faster to fit; twice as fast again when the speaker is hurrying
+  const FX_CAP = 1600;   // ms: a longer effect plays faster to fit; twice as fast again when the speaker is hurrying
   // a shuffled bag: every item comes out once before any comes back, and never twice running
   const bags = {};
   function draw(key, items) {
@@ -1552,7 +1552,7 @@
     if (set.extras) set.extras(t, extra);
     // pace: fit within FX_CAP, and double speed on a jump or two slide changes in quick succession
     const end = Math.max(0, ...anims.map(a => a.effect.getComputedTiming().endTime)), now = performance.now();
-    const rate = Math.max(1, end / FX_CAP) * (now - fxLastAt < 900 || Math.abs(to - from) > 1 ? 2 : 1);
+    const rate = 1.5 * Math.max(1, end / FX_CAP) * (now - fxLastAt < 900 || Math.abs(to - from) > 1 ? 2 : 1);
     fxLastAt = now;
     if (rate !== 1) anims.forEach(a => { a.playbackRate = rate; });
     queued.forEach(([name, at, arg]) => timers.push(setTimeout(() => SOUNDS[name](typeof arg === 'number' ? arg / rate : arg), at / rate)));
@@ -3081,7 +3081,7 @@
     setBuild(slides[cur], step);
     const pin = from >= 0 && from !== cur ? (slides[cur > from ? cur : from].dataset.fx || '') : '';
     const pinOk = pin !== '' && pin !== 'none' && SETS[pin.split(':')[0]] && SETS[pin.split(':')[0]].fx[pin.split(':')[1]];
-    if (from >= 0 && from !== cur && (fxMode !== 'off' || pinOk) && pin !== 'none' && !dev && !document.hidden && !fxSkip) {
+    if (from >= 0 && from !== cur && (fxMode !== 'off' || pinOk) && pin !== 'none' && !dev && !document.hidden && !fxSkip && !document.documentElement.classList.contains('nofx')) {
       if (pinOk && !fxForce) fxForce = pin;
       fxRun = playTransition(from, shownStep, cur, step, cur > from ? 1 : -1);
     }
