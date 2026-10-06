@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unseen characters</title>
+<link rel="stylesheet" href="assets/katex/katex.min.css">
+<link rel="stylesheet" href="assets/deck.css">
+<style>
+/* the three families keep one colour across every slide and the chart */
+.f-pred{--fc:var(--gold);--w:var(--gold-w)}
+.f-emb {--fc:var(--green);--w:var(--green-w)}
+.f-ali {--fc:var(--blue);--w:var(--blue-w)}
+:where(.slide) p{color:inherit;line-height:normal}
+/* hook: one giant glyph */
+.giant{font-family:var(--cjk);font-size:300px;line-height:1;text-align:center;color:var(--paper)}
+.parts{font-family:var(--cjk);font-size:46px;letter-spacing:.18em;text-align:center;color:#e0956f}
+/* the big number of the problem slide */
+.huge{font-family:var(--serif);font-weight:700;font-size:120px;line-height:1;color:var(--accent)}
+.huge.ink{color:var(--ink2)}
+.lbl{font-size:20px;color:var(--ink2);margin-top:6px}
+/* family slides: the same strip at the top of each */
+.strip{display:flex;align-items:center;gap:14px;font-size:18px}
+.strip .bx{background:#fff;border:1.5px solid var(--fc);border-radius:10px;padding:10px 14px;text-align:center}
+.strip .bx.cjk{font-size:34px;padding:4px 14px}
+.strip .ar{color:var(--muted);font-size:22px}
+.weak{border-left:4px solid var(--fc);padding:8px 14px;background:var(--w);font-size:19px;color:var(--ink)}
+.papers{font-size:16px;color:var(--muted)}
+.papers b{color:var(--ink2)}
+table.code td,table.code th{padding:6px 14px;font-variant-numeric:tabular-nums;text-align:center}
+.fams .card.sm{padding:26px 28px;gap:14px}
+.fams .card.sm h3{font-size:30px}
+.fams .card.sm p{font-size:21px}
+table.code td:first-child{font-family:var(--cjk);font-size:26px}
+/* family 4 (match to a font) — outside the three IDS families */
+.f-font{--fc:var(--accent);--w:var(--accent-w)}
+/* topic slide: glyph crops */
+.crops{display:flex;gap:12px;align-items:center}
+.crops img{height:96px;border:1px solid var(--line);border-radius:6px;background:#fff}
+.crops .lab{font-family:var(--cjk);font-size:40px;color:var(--accent)}
+/* tiny example under each family card */
+.mini{margin-top:auto;padding-top:8px;border-top:1px dashed var(--line)}
+.mini svg{width:100%;height:92px}
+/* bar chart rows (MegaHan slide) */
+.hbar{display:grid;grid-template-columns:150px 1fr 60px;align-items:center;gap:10px;font-size:17px;margin:5px 0}
+.hbar .t{height:20px;border-radius:4px;background:var(--fc)}
+.hbar .v{font-weight:700;color:var(--fc)}
+/* slide 2: "far too many classes" — words drop in, bounce, then shimmer through the palette */
+.boom{text-align:center;font-family:var(--serif);font-weight:800;font-size:64px;line-height:1.1;margin:auto 0}
+.boom span{display:inline-block;margin:0 .14em;opacity:0}
+.boom span:nth-child(4n+1){color:var(--accent)}
+.boom span:nth-child(4n+2){color:var(--gold)}
+.boom span:nth-child(4n+3){color:var(--green)}
+.boom span:nth-child(4n+4){color:var(--blue)}
+.boom.on span{animation:drop .7s cubic-bezier(.3,1.6,.5,1) both, hue 2.4s linear .9s infinite}
+.boom.on span:nth-child(2){animation-delay:.12s,1s}
+.boom.on span:nth-child(3){animation-delay:.24s,1.1s}
+.boom.on span:nth-child(4){animation-delay:.36s,1.2s}
+.boom.on span:nth-child(5){animation-delay:.48s,1.3s}
+@keyframes drop{0%{opacity:0;transform:translateY(-260px) rotate(-25deg) scale(.4)}
+  60%{opacity:1;transform:translateY(12px) rotate(8deg) scale(1.25)}
+  80%{transform:translateY(-6px) rotate(-4deg) scale(.95)}
+  100%{opacity:1;transform:none}}
+@keyframes hue{0%,100%{filter:hue-rotate(0deg)}50%{filter:hue-rotate(180deg)}}
+@media print{.boom span{opacity:1!important;animation:none!important}}
+/* closing slide: the title jumps, does a backflip, lands with a squash */
+.thanks{perspective:900px;text-align:center}
+.thanks h1{font-size:76px;color:var(--paper);display:inline-block;transform-origin:50% 60%}
+.slide.active .thanks h1{animation:backflip 1.6s cubic-bezier(.4,0,.3,1) .2s both}
+@keyframes backflip{
+  0%  {opacity:0;transform:translateY(260px) scale(.9)}
+  20% {opacity:1;transform:translateY(0) scaleY(.75) scaleX(1.12)}
+  35% {transform:translateY(-170px) rotateX(0deg)}
+  70% {transform:translateY(-170px) rotateX(-360deg)}
+  85% {transform:translateY(12px) scaleY(.72) scaleX(1.18) rotateX(-360deg)}
+  93% {transform:translateY(-14px) scaleY(1.06) scaleX(.97) rotateX(-360deg)}
+  100%{opacity:1;transform:rotateX(-360deg)}}
+@media print{.thanks h1{animation:none!important;opacity:1}}
+</style>
+</head>
+<body>
+
+<div id="deck" data-foot="M. Wauquiez &mdash; literature review &middot; zero-shot Chinese character recognition" data-ui="en" data-transitions="off">
+
+<!-- 1 · HOOK (0:30) ======================================================= -->
+<section class="slide dark" id="hook">
+  <div class="body" style="justify-content:center;gap:18px">
+    <div class="giant">𰻞</div>
+    <div class="parts frag">辶 穴 月 幺 長 言 馬 幺 長 刂 心</div>
+    <div class="frag" style="text-align:center;font-size:22px;color:#cfc6b4">
+      <b style="color:var(--paper)">biáng</b>, as in <i>biángbiáng</i> noodles &middot; 58 strokes &middot;
+      eleven parts, every one of them common</div>
+  </div>
+  <aside class="notes">0:30. "Can you read this?" Don't wait for hands, answer it:
+    most people can't, including native speakers. Click: but you know every piece.
+    Click: biáng, the noodle character. Reading it means reading its parts.
+    That is the whole talk.</aside>
+</section>
+
+<!-- 2 · THE TOPIC (0:35) ================================================== -->
+<section class="slide" data-fx="bowling:shatter">
+  <div class="kicker">The topic</div>
+  <h1>Chinese character classification</h1>
+  <div class="body"><div class="cols nogrow">
+    <div class="col mid">
+      <div class="strip f-ali" style="font-size:20px">
+        <div class="crops"><img src="figures/g_ji1.png" alt="a printed glyph of 集 cut from a page"></div>
+        <span class="ar">&rarr;</span>
+        <div class="bx">classifier<br><span class="dim" style="font-size:15px">one output per character</span></div>
+        <span class="ar">&rarr;</span>
+        <div class="bx" style="font-size:20px"><span class="cjk" style="font-size:34px">集</span><br><span class="dim" style="font-size:14px">U+96C6</span></div>
+      </div>
+      <ul class="b mt-l">
+        <li>Input: <b>one glyph</b>, already cut out of the page.</li>
+        <li>Output: <b>which character</b> it is, among thousands of classes.</li>
+        <li>The reading step of OCR, for scripts with no alphabet.</li>
+      </ul>
+    </div>
+    <div class="col mid" style="flex:0.9">
+      <div class="card">
+        <h3>Why it is hard</h3>
+        <p><b>Same class, different looks:</b></p>
+        <div class="crops"><img src="figures/g_ji1.png" alt="集"><img src="figures/g_ji2.png" alt="集, another print">
+          <span class="lab">集</span></div>
+        <p class="mt-s"><b>Different classes, near-identical looks:</b></p>
+        <p><span class="cjk" style="font-size:34px;color:var(--ink)">未 末 &middot; 己 已 巳 &middot; 呆 杏</span></p>
+              </div>
+    </div>
+  </div>
+  <div class="boom frag nogrow"><span>And</span><span>far</span><span>too</span><span>many</span><span>classes!</span></div>
+  </div>
+  <aside class="notes">0:35. The task: you get a glyph cut out of a page, you return its
+    Unicode character. For Chinese that is a classification problem with thousands of
+    classes. Two glyphs from the same book, same class, different shapes; and pairs like
+    未/末 or 己/已/巳 differ by one stroke length. And the number of classes is the real problem.</aside>
+</section>
+
+<!-- 2 · THE PROBLEM (0:30) ================================================ -->
+<section class="slide" data-fx="arcade:shooter">
+  <div class="kicker">The problem</div>
+  <h1>A classifier cannot output <span class="thin">a class it never saw</span></h1>
+  <div class="body" style="justify-content:center">
+    <div class="cols" style="align-items:flex-end;text-align:center">
+      <div class="col"><div class="huge ink">3,755</div>
+        <div class="lbl">classes in the standard training set<br>(enough for daily reading)</div></div>
+      <div class="col frag"><div class="huge">97,000+</div>
+        <div class="lbl">Han characters in Unicode<br>(old books use the long tail)</div></div>
+      <div class="col frag"><div class="huge ink">0&nbsp;%</div>
+        <div class="lbl">a softmax's accuracy<br>on everything else</div></div>
+    </div>
+  </div>
+  <div class="takeline frag">Zero-shot: recognise a character from its <b>description</b>,
+    as you would read a new word by spelling it.</div>
+  <aside class="notes">0:30. Training sets stop at a few thousand classes; historical
+    documents keep using the rest. A classifier with one output per class has no output
+    for them. So we describe characters instead, the way you'd sound out a word.</aside>
+</section>
+
+<!-- 3 · IDS (0:40) ======================================================== -->
+<section class="slide" data-fx="bowling:pinsetter">
+  <div class="kicker">The shared idea</div>
+  <h1>A character is a tree <span class="thin">of radicals</span></h1>
+  <div class="body"><div class="cols">
+    <div class="col mid">
+      <div class="diagram">
+        <svg viewBox="0 0 420 250" style="width:100%;max-height:300px" role="img"
+             aria-label="森 written as a tree: top-bottom of 木 and a left-right of 木 木">
+          <g font-family="Noto Sans CJK SC, sans-serif" text-anchor="middle">
+            <text x="60" y="140" font-size="96" style="fill:var(--ink)">森</text>
+            <text x="135" y="125" font-size="30" style="fill:var(--muted)">=</text>
+            <g class="frag" data-frag="1">
+              <circle cx="290" cy="40" r="24" fill="var(--paper2)" stroke="var(--line)"/>
+              <text x="290" y="50" font-size="26" style="fill:var(--ink2)">⿱</text>
+              <line x1="274" y1="58" x2="226" y2="104" stroke="var(--line)" stroke-width="2"/>
+              <line x1="306" y1="58" x2="354" y2="104" stroke="var(--line)" stroke-width="2"/>
+              <circle cx="216" cy="122" r="24" fill="#fff" stroke="var(--accent)"/>
+              <text x="216" y="132" font-size="26" style="fill:var(--accent)">木</text>
+              <circle cx="364" cy="122" r="24" fill="var(--paper2)" stroke="var(--line)"/>
+              <text x="364" y="132" font-size="26" style="fill:var(--ink2)">⿰</text>
+              <line x1="350" y1="140" x2="318" y2="186" stroke="var(--line)" stroke-width="2"/>
+              <line x1="378" y1="140" x2="398" y2="186" stroke="var(--line)" stroke-width="2"/>
+              <circle cx="310" cy="204" r="22" fill="#fff" stroke="var(--accent)"/>
+              <text x="310" y="213" font-size="24" style="fill:var(--accent)">木</text>
+              <circle cx="398" cy="204" r="20" fill="#fff" stroke="var(--accent)"/>
+              <text x="398" y="212" font-size="22" style="fill:var(--accent)">木</text>
+              <g font-family="var(--sans)" font-size="14" font-style="italic" style="fill:var(--blue)">
+                <text x="236" y="76" text-anchor="end">top</text>
+                <text x="344" y="76" text-anchor="start">bottom</text>
+                <text x="326" y="166" text-anchor="end">left</text>
+                <text x="394" y="166" text-anchor="start">right</text>
+              </g>
+            </g>
+            <text class="frag" data-frag="2" x="210" y="246" font-family="var(--mono)" font-size="20"
+                  style="fill:var(--ink2)">⿱ 木 ⿰ 木 木</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="col mid" style="flex:0.9">
+      <ul class="b">
+        <li><b>~500 radicals</b> and <b>12 layout operators</b> (⿰ left-right, ⿱ top-bottom&hellip;)
+          build every character.</li>
+        <li>Unicode writes the tree as a string, the <b>IDS</b>. Every paper reads the same file.</li>
+      </ul>
+      <div class="card mt nogrow frag" data-frag="3">
+        <h3>The benchmark</h3>
+        <p>Train on <b><i>m</i></b> handwritten classes (500 to 2,755).
+          Test on <b>1,000 classes never seen</b>. Fewer training classes = harder.</p>
+      </div>
+    </div>
+  </div></div>
+  <aside class="notes">0:40. 森, forest, is three trees: a tree on top of two trees side
+    by side. Click: as a tree. Click: as a string, that's the IDS, and everybody
+    uses it. Click: the benchmark everyone reports. Train on m classes, test on 1,000
+    unseen ones. Keep m in mind: small m is the hard case.</aside>
+</section>
+
+<!-- 4 · THREE FAMILIES (0:20) ============================================= -->
+<section class="slide" data-fx="arcade:pacman">
+  <div class="kicker">Three ways to use the tree</div>
+  <h1>Predict it, encode it, <span class="thin">or align with it</span></h1>
+  <div class="body" style="justify-content:center"><div class="cards nogrow fams">
+    <div class="card sm f-pred"><span class="tag">1</span><h3>Predict</h3>
+      <p>Read the image, <b>write out</b> its tree, look it up in a dictionary.</p>
+      <p class="dim">&asymp; image captioning</p>
+      <div class="mini"><svg viewBox="0 0 300 92" role="img" aria-label="the decoder has written ⿱ 木 ⿰ 木 and predicts the next token">
+        <g font-family="Noto Sans CJK SC, sans-serif" font-size="20" text-anchor="middle">
+          <rect x="8" y="22" width="40" height="38" rx="6" fill="#fff" stroke="var(--line)"/><text x="28" y="49" style="fill:var(--ink2)">⿱</text><rect x="56" y="22" width="40" height="38" rx="6" fill="#fff" stroke="var(--line)"/><text x="76" y="49" style="fill:var(--ink2)">木</text><rect x="104" y="22" width="40" height="38" rx="6" fill="#fff" stroke="var(--line)"/><text x="124" y="49" style="fill:var(--ink2)">⿰</text><rect x="152" y="22" width="40" height="38" rx="6" fill="#fff" stroke="var(--line)"/><text x="172" y="49" style="fill:var(--ink2)">木</text>
+          <rect x="200" y="22" width="40" height="38" rx="6" fill="var(--gold-w)" stroke="var(--gold)" stroke-width="2" stroke-dasharray="4 3"/>
+          <text x="220" y="49" font-family="var(--sans)" font-weight="700" style="fill:var(--gold)">?</text>
+          <text x="150" y="84" font-family="var(--sans)" font-size="13" style="fill:var(--muted)">next token, one at a time</text>
+        </g></svg></div></div>
+    <div class="card sm f-emb"><span class="tag">2</span><h3>Encode</h3>
+      <p>Turn each tree into a <b>fixed vector</b>; train the image network to hit it.</p>
+      <p class="dim">&asymp; attribute-based zero-shot</p>
+      <div class="mini"><svg viewBox="0 0 300 92" role="img" aria-label="fixed class vectors on a circle; the image vector lands near 森">
+        <defs><marker id="ga" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="var(--green)"/></marker>
+        <marker id="ia" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><path d="M0,0 L0,5 L7,2.5 z" fill="var(--ink)"/></marker></defs>
+        <g font-family="Noto Sans CJK SC, sans-serif" text-anchor="middle">
+          <circle cx="150" cy="44" r="34" fill="none" stroke="var(--line)"/>
+          <line x1="150" y1="44" x2="176" y2="22" stroke="var(--green)" stroke-width="2" marker-end="url(#ga)"/><text x="187" y="19" font-size="15" style="fill:var(--green)">森</text><line x1="150" y1="44" x2="128" y2="18" stroke="var(--green)" stroke-width="2" marker-end="url(#ga)"/><text x="119" y="13" font-size="15" style="fill:var(--green)">呆</text><line x1="150" y1="44" x2="122" y2="64" stroke="var(--green)" stroke-width="2" marker-end="url(#ga)"/><text x="111" y="78" font-size="15" style="fill:var(--green)">杏</text><line x1="150" y1="44" x2="167" y2="73" stroke="var(--green)" stroke-width="2" marker-end="url(#ga)"/><text x="174" y="92" font-size="15" style="fill:var(--green)">林</text>
+          <line x1="150" y1="44" x2="170" y2="22" stroke="var(--ink)" stroke-width="2" stroke-dasharray="3 2" marker-end="url(#ia)"/>
+          <text x="236" y="40" font-family="var(--sans)" font-size="12" text-anchor="start" style="fill:var(--ink)">image</text>
+          <text x="236" y="56" font-family="var(--sans)" font-size="12" text-anchor="start" style="fill:var(--green)">fixed codes</text>
+        </g></svg></div></div>
+    <div class="card sm f-ali"><span class="tag">3</span><h3>Align</h3>
+      <p><b>Learn</b> an encoder for the tree too, and match images to trees.</p>
+      <p class="dim">&asymp; CLIP</p>
+      <div class="mini"><svg viewBox="0 0 300 92" role="img" aria-label="CLIP: three images against three IDS strings, matching pairs on the diagonal">
+        <g font-family="Noto Sans CJK SC, sans-serif" font-size="15" text-anchor="middle">
+          <rect x="112" y="14" width="26" height="22" rx="3" fill="#fff" stroke="var(--line)"/><text x="125" y="30" style="fill:var(--ink)">森</text><rect x="112" y="38" width="26" height="22" rx="3" fill="#fff" stroke="var(--line)"/><text x="125" y="54" style="fill:var(--ink)">呆</text><rect x="112" y="62" width="26" height="22" rx="3" fill="#fff" stroke="var(--line)"/><text x="125" y="78" style="fill:var(--ink)">林</text>
+          <rect x="150" y="14" width="24" height="22" rx="3" fill="var(--blue)" opacity="1"/><rect x="176" y="14" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="202" y="14" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="150" y="38" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="176" y="38" width="24" height="22" rx="3" fill="var(--blue)" opacity="1"/><rect x="202" y="38" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="150" y="62" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="176" y="62" width="24" height="22" rx="3" fill="var(--paper2)" opacity="0.9"/><rect x="202" y="62" width="24" height="22" rx="3" fill="var(--blue)" opacity="1"/>
+          <text x="189" y="9" font-family="var(--sans)" font-size="11" style="fill:var(--blue)">IDS strings</text>
+          <text x="80" y="50" font-family="var(--sans)" font-size="12" style="fill:var(--muted)">images</text>
+          <text x="264" y="50" font-family="var(--sans)" font-size="11" style="fill:var(--muted)">match</text><text x="264" y="63" font-family="var(--sans)" font-size="11" style="fill:var(--muted)">= diagonal</text>
+        </g></svg></div></div>
+  </div></div>
+  <aside class="notes">0:20. Signposting only. Three families, each one is an idea you've
+    already met elsewhere: captioning, attribute zero-shot, CLIP.</aside>
+</section>
+
+<!-- 5 · PREDICT (0:50) ==================================================== -->
+<section class="slide f-pred" data-fx="bowling:pins">
+  <div class="kicker">Family 1 &middot; Predict</div>
+  <h1>Write the tree, <span class="thin">then look it up</span></h1>
+  <div class="body">
+    <div class="strip">
+      <div class="bx cjk">森</div><span class="ar">&rarr;</span>
+      <div class="bx">CNN</div><span class="ar">&rarr;</span>
+      <div class="bx">attention decoder</div><span class="ar">&rarr;</span>
+      <div class="bx" style="font-family:var(--cjk)">⿱ 木 ⿰ 木 木</div><span class="ar">&rarr;</span>
+      <div class="bx">dictionary lookup</div><span class="ar">&rarr;</span>
+      <div class="bx cjk">森</div>
+    </div>
+    <div class="cols mt">
+      <div class="col" style="flex:1.25">
+        <figure class="fig"><img src="figures/ran.png" alt="RAN: CNN encoder, RNN decoder whose
+          attention moves over the character, one radical per step" style="max-height:290px">
+          <figcaption>Each radical the decoder writes comes with an attention map: where it looked.
+            <span class="src">RAN, Zhang et al., ICME 2018</span></figcaption></figure>
+      </div>
+      <div class="col mid">
+        <p class="papers"><b>RAN / DenseRAN</b> 2018 &rarr; <b>RSST</b> 2024 &rarr; <b>CDC-RAN</b> 2025</p>
+        <ul class="b tight mt">
+          <li>Interpretable: one radical, one region.</li>
+          <li>Errors pile up along the sequence; one wrong token, wrong character.</li>
+        </ul>
+        <div class="weak mt frag">The decoder learns to write <b>combinations it has seen</b>.
+          Faced with a new character, it writes a familiar one.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">0:50. First idea, 2018: treat recognition as captioning. The
+    decoder writes the tree token by token; you look the string up. Nice: you see where it
+    looks. Problem: it's a language model over radicals, so it prefers combinations from
+    training, which is exactly what zero-shot is not. And it's slow: one decode per image.</aside>
+</section>
+
+<!-- 6 · ENCODE (0:50) ===================================================== -->
+<section class="slide f-emb" data-fx="arcade:snake">
+  <div class="kicker">Family 2 &middot; Encode</div>
+  <h1>Compile the tree <span class="thin">into a fixed vector</span></h1>
+  <div class="body">
+    <div class="strip">
+      <div class="bx cjk">森</div><span class="ar">&rarr;</span>
+      <div class="bx">CNN</div><span class="ar">&rarr;</span>
+      <div class="bx">vector</div><span class="ar">&harr;</span>
+      <div class="bx">nearest class code</div>
+      <span class="ar" style="margin-left:24px">&larr;</span>
+      <div class="bx" style="border-style:dashed">code, designed by hand from the tree</div>
+    </div>
+    <div class="cols mt">
+      <div class="col">
+        <h5 class="smaller" style="color:var(--fc)">Building a code: HDE (2020), simplified</h5>
+        <div class="eq" style="font-size:20px">$\varphi(y)=\sum_{\text{radical } r} \alpha^{d_r}\, e_r \;+\; \lambda \sum_{\text{operator } s} \alpha^{d_s}\, e_s$</div>
+        <p class="xs dim mt-s">one dimension per radical / operator; $d$ = depth in the tree; $\alpha=\lambda=\tfrac12$</p>
+        <table class="tbl code mt-s" style="font-size:17px">
+          <tr><th>森 = ⿱ 木 ⿰ 木 木</th><th>depth</th><th>adds</th></tr>
+          <tr><td style="font-size:20px">⿱</td><td>0</td><td>$\lambda\alpha^0 = 0.5$ to $e_{⿱}$</td></tr>
+          <tr><td style="font-size:20px">木 (top)</td><td>1</td><td>$\alpha^1 = 0.5$ to $e_{木}$</td></tr>
+          <tr><td style="font-size:20px">⿰</td><td>1</td><td>$\lambda\alpha^1 = 0.25$ to $e_{⿰}$</td></tr>
+          <tr><td style="font-size:20px">木, 木</td><td>2</td><td>$2\alpha^2 = 0.5$ to $e_{木}$</td></tr>
+        </table>
+        <p class="xs mt-s">&rArr; $\varphi(森)$: 木 = <b>1.0</b>, ⿱ = <b>0.5</b>, ⿰ = <b>0.25</b>, every other dim 0.</p>
+      </div>
+      <div class="col mid" style="flex:0.85">
+        <p class="papers"><b>HDE</b> 2020 &rarr; <b>CUE</b> 2023 &rarr; <b>HierCode</b> 2025 &rarr; <b>JRED</b> 2025</p>
+        <div class="eq mt-s" style="font-size:19px">$\hat y = \arg\max_{y\,\in\,\text{all classes}} \cos\big(f(x),\,\varphi(y)\big)$</div>
+        <p class="xs dim">train the image network $f$ on seen classes; unseen ones only need their $\varphi$.</p>
+        <div class="weak mt frag">The code is <b>frozen before training</b>. 呆 (口 over 木) and 杏 (木 over 口)
+          get the same counts: only a tiny position term, in the 4th decimal, tells them apart.</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">0:50. Drop the decoder. Give each class a vector computed from its
+    tree, regress the image onto it, take the nearest code. Walk the table: count each node,
+    weighted by one half per level of depth. 森 gets 1.0 on 木. (The real HDE adds a tiny
+    position term, which I dropped; removing it costs only 0.31 pt.) 呆 and 杏 are the same parts
+    in a different order, and their codes differ in the fourth
+    decimal. The code is hand-made and fixed, so the network can't fix that.</aside>
+</section>
+
+<!-- 7 · ALIGN + IDS ENCODERS (0:50) ======================================= -->
+<section class="slide f-ali" data-fx="bowling:disco">
+  <div class="kicker">Family 3 &middot; Align</div>
+  <h1>Learn both sides: <span class="thin">CLIP, with the tree as caption</span></h1>
+  <div class="body">
+    <div class="strip">
+      <div class="bx cjk">森</div><span class="ar">&rarr;</span>
+      <div class="bx">image encoder</div><span class="ar">&rarr;</span>
+      <div class="bx" style="border-width:2.5px"><b>similarity</b><br><span class="dim" style="font-size:14px">contrastive loss</span></div>
+      <span class="ar">&larr;</span>
+      <div class="bx"><b>IDS encoder</b></div><span class="ar">&larr;</span>
+      <div class="bx" style="font-family:var(--cjk)">⿱ 木 ⿰ 木 木</div>
+      <span class="papers" style="margin-left:10px">at test time: nearest of<br>all candidate trees</span>
+    </div>
+    <h5 class="smaller mt" style="color:var(--fc)">What moved: the IDS encoder. Same images, same strings, same benchmark (<i>m</i> = 2,755)</h5>
+    <div class="diagram nogrow">
+      <svg viewBox="0 0 900 150" style="width:100%;max-height:205px" role="img"
+           aria-label="Three encoders of the same IDS: a flat sequence, a tree read bottom-up, a tree read top-down with child ranks">
+        <defs><marker id="rar" markerWidth="8" markerHeight="8" refX="7" refY="2.6" orient="auto">
+          <path d="M0,0 L0,5.2 L8,2.6 z" fill="var(--ink2)"/></marker></defs>
+        <g font-family="Noto Sans CJK SC, sans-serif" font-size="17" text-anchor="middle">
+          <g>
+            <rect x="14"  y="44" width="34" height="30" rx="5" fill="var(--paper2)" stroke="var(--line)"/>
+            <rect x="52"  y="44" width="34" height="30" rx="5" fill="#fff" stroke="var(--blue)"/>
+            <rect x="90"  y="44" width="34" height="30" rx="5" fill="var(--paper2)" stroke="var(--line)"/>
+            <rect x="128" y="44" width="34" height="30" rx="5" fill="#fff" stroke="var(--blue)"/>
+            <rect x="166" y="44" width="34" height="30" rx="5" fill="#fff" stroke="var(--blue)"/>
+            <text x="31" y="65" style="fill:var(--ink2)">⿱</text><text x="69" y="65" style="fill:var(--blue)">木</text>
+            <text x="107" y="65" style="fill:var(--ink2)">⿰</text><text x="145" y="65" style="fill:var(--blue)">木</text>
+            <text x="183" y="65" style="fill:var(--blue)">木</text>
+          </g>
+          <g class="frag" data-frag="1">
+            <circle cx="400" cy="26" r="15" fill="var(--paper2)" stroke="var(--line)"/><text x="400" y="32" style="fill:var(--ink2)">⿱</text>
+            <line x1="352" y1="56" x2="389" y2="37" stroke="var(--line)" marker-end="url(#rar)"/>
+            <line x1="448" y1="56" x2="411" y2="37" stroke="var(--line)" marker-end="url(#rar)"/>
+            <circle cx="344" cy="68" r="15" fill="#fff" stroke="var(--blue)"/><text x="344" y="74" style="fill:var(--blue)">木</text>
+            <circle cx="456" cy="68" r="15" fill="var(--paper2)" stroke="var(--line)"/><text x="456" y="74" style="fill:var(--ink2)">⿰</text>
+            <line x1="414" y1="98" x2="445" y2="79" stroke="var(--line)" marker-end="url(#rar)"/>
+            <line x1="498" y1="98" x2="467" y2="79" stroke="var(--line)" marker-end="url(#rar)"/>
+            <circle cx="406" cy="110" r="15" fill="#fff" stroke="var(--blue)"/><text x="406" y="116" style="fill:var(--blue)">木</text>
+            <circle cx="506" cy="110" r="15" fill="#fff" stroke="var(--blue)"/><text x="506" y="116" style="fill:var(--blue)">木</text>
+          </g>
+          <g class="frag" data-frag="2">
+            <circle cx="760" cy="26" r="15" fill="var(--paper2)" stroke="var(--line)"/><text x="760" y="32" style="fill:var(--ink2)">⿱</text>
+            <line x1="749" y1="37" x2="712" y2="56" stroke="var(--line)" marker-end="url(#rar)"/>
+            <line x1="771" y1="37" x2="808" y2="56" stroke="var(--line)" marker-end="url(#rar)"/>
+            <circle cx="704" cy="68" r="15" fill="#fff" stroke="var(--blue)"/><text x="704" y="74" style="fill:var(--blue)">木</text>
+            <circle cx="816" cy="68" r="15" fill="var(--paper2)" stroke="var(--line)"/><text x="816" y="74" style="fill:var(--ink2)">⿰</text>
+            <line x1="805" y1="79" x2="774" y2="98" stroke="var(--line)" marker-end="url(#rar)"/>
+            <line x1="827" y1="79" x2="858" y2="98" stroke="var(--line)" marker-end="url(#rar)"/>
+            <circle cx="766" cy="110" r="15" fill="#fff" stroke="var(--blue)"/><text x="766" y="116" style="fill:var(--blue)">木</text>
+            <circle cx="866" cy="110" r="15" fill="#fff" stroke="var(--blue)"/><text x="866" y="116" style="fill:var(--blue)">木</text>
+            <g font-family="var(--sans)" font-size="11">
+              <text x="686" y="58" text-anchor="end" style="fill:var(--accent)">1st</text>
+              <text x="834" y="58" text-anchor="start" style="fill:var(--accent)">2nd</text>
+              <text x="748" y="100" text-anchor="end" style="fill:var(--accent)">1st</text>
+              <text x="884" y="100" text-anchor="start" style="fill:var(--accent)">2nd</text>
+            </g>
+          </g>
+          <g font-family="var(--sans)" font-size="14" style="fill:var(--ink2)">
+            <text x="107" y="104">sequence &middot; Transformer</text>
+            <text x="425" y="140" class="frag" data-frag="1">tree, read leaves &rarr; root</text>
+            <text x="790" y="140" class="frag" data-frag="2">graph, root &rarr; leaves, child rank</text>
+          </g>
+          <g font-family="var(--serif)" font-size="20" font-weight="700" style="fill:var(--blue)">
+            <text x="107" y="130">CCR-CLIP 2023 &middot; 73.0</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div class="cols nogrow" style="font-size:18px;line-height:1.35;color:var(--ink2);text-align:center">
+      <div class="col">Structure written nowhere: learned from token order.</div>
+      <div class="col frag" data-frag="1"><b style="color:var(--blue)">FT-CLIP 2025 &middot; 79.0</b> &nbsp;each node attends to its children, and knows where they sit.</div>
+      <div class="col frag" data-frag="2"><b style="color:var(--blue)">GRSTR 2026 &middot; 80.6</b> &nbsp;a GNN pushes layout down, and 1st&nbsp;/&nbsp;2nd child differ: 呆&nbsp;&ne;&nbsp;杏.</div>
+    </div>
+    <div class="weak mt-s nogrow frag" data-frag="3">Next step, outside the encoder: match image regions to <b>each radical</b>,
+      not one vector to one vector. <b>Hi-GITA 2025: 85.4.</b></div>
+  </div>
+  <aside class="notes">0:50. CLIP, where the caption is the tree. Two encoders, contrastive
+    loss; at test time encode every candidate tree once and take the nearest. Zero-shot for
+    free. Since 2023 the action is in the text side. Flat sequence: 73. Click: tree encoder,
+    79. Click: graph with child order, 81 (it finally tells 呆 from 杏). Click: then people
+    stopped comparing whole vectors and matched radicals to image regions: 85.</aside>
+</section>
+
+<!-- 8b · MATCH TO A FONT (0:35) ========================================= -->
+<section class="slide f-font" data-fx="arcade:pixels">
+  <div class="kicker">And without the tree?</div>
+  <h1>Match the image <span class="thin">to a printed font</span></h1>
+  <div class="body">
+    <div class="strip">
+      <div class="crops"><img src="figures/g_ji2.png" alt="a printed glyph of 集"></div><span class="ar">&rarr;</span>
+      <div class="bx">image encoder</div><span class="ar">&rarr;</span>
+      <div class="bx" style="border-width:2.5px"><b>similarity</b></div><span class="ar">&larr;</span>
+      <div class="bx">same encoder</div><span class="ar">&larr;</span>
+      <div class="bx cjk" style="font-family:'Noto Serif CJK TC',serif">集</div>
+      <span class="papers" style="margin-left:10px">one font rendering<br>per candidate class</span>
+    </div>
+    <div class="cols mt-l">
+      <div class="col mid">
+        <p class="papers"><b>OpenCCD</b> CVPR 2022 &rarr; <b>PCSS</b> 2024</p>
+        <ul class="b tight mt">
+          <li>Same CLIP idea, but the "caption" is <b>a picture of the character in a font</b>,
+            not its tree.</li>
+          <li>Works where no tree exists: Japanese kana never seen in training, rare variants.</li>
+        </ul>
+      </div>
+      <div class="col mid">
+        <div class="weak">Needs a font that <b>draws every class</b>. Fewer than 5 fonts cover all 97k
+          characters, and a modern font is not the shape of a 17th-century woodblock.</div>
+        <p class="xs dim mt">On the next chart it is drawn dashed: each unseen class comes with a printed glyph the tree methods never see, so it is not a like-for-like comparison.</p>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">0:35. The obvious alternative: forget the tree, render each class in
+    a font and match the image to the rendering. OpenCCD and PCSS do that. It even handles
+    scripts with no decomposition, like kana. The catch: you need a font that has every
+    glyph, and font shapes are not woodblock shapes. (My own test: adding an ink-to-font
+    contrastive term to my encoder gave nothing, −0.8 pt top-1 font matching.)</aside>
+</section>
+
+<!-- 8 · THE REVEAL (1:30) ================================================= -->
+<section class="slide" data-fx="bowling:strike">
+  <div class="kicker">Ten methods, one benchmark</div>
+  <h1>Retrieval beats prediction, <span class="thin">by a lot</span></h1>
+  <div class="body"><div class="cols">
+    <div class="col nogrow" style="flex:none;width:730px">
+<svg viewBox="0 0 720 446" style="width:720px;height:446px;flex:none" role="img" font-family="var(--sans)" aria-label="Zero-shot Top-1 accuracy by method and family, with 500 and 2755 training classes">
+<text x="150" y="16" font-size="14" style="fill:var(--ink2)">Top-1 (%), 1,000 unseen characters &#160;·&#160; <tspan font-weight="700">○</tspan> 500 training classes &#160;<tspan font-weight="700">●</tspan> 2,755</text>
+<line x1="150.0" y1="42" x2="150.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="150.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">0</text>
+<line x1="196.0" y1="42" x2="196.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="196.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">10</text>
+<line x1="242.0" y1="42" x2="242.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="242.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">20</text>
+<line x1="288.0" y1="42" x2="288.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="288.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">30</text>
+<line x1="334.0" y1="42" x2="334.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="334.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">40</text>
+<line x1="380.0" y1="42" x2="380.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="380.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">50</text>
+<line x1="426.0" y1="42" x2="426.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="426.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">60</text>
+<line x1="472.0" y1="42" x2="472.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="472.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">70</text>
+<line x1="518.0" y1="42" x2="518.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="518.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">80</text>
+<line x1="564.0" y1="42" x2="564.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="564.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">90</text>
+<line x1="610.0" y1="42" x2="610.0" y2="432" stroke="var(--line)" stroke-width="1"/>
+<text x="610.0" y="36" text-anchor="middle" font-size="12" style="fill:var(--muted)">100</text>
+<g class="frag" data-frag="1">
+<text x="8" y="60" font-size="13" font-weight="700" letter-spacing=".08em" style="fill:var(--gold)">1 · PREDICT</text>
+<text x="138" y="79" text-anchor="end" font-size="16" style="fill:var(--ink)">DenseRAN <tspan style="fill:var(--muted)" font-size="12">2018</tspan></text>
+<line x1="157.8" y1="74" x2="291.1" y2="74" stroke="var(--gold)" stroke-width="3" opacity=".45"/>
+<circle cx="157.8" cy="74" r="6" fill="var(--paper)" stroke="var(--gold)" stroke-width="2.5"/>
+<circle cx="291.1" cy="74" r="7" style="fill:var(--gold)"/>
+<text x="303.1" y="79" font-size="15" font-weight="700" style="fill:var(--gold)">30.7</text>
+<text x="138" y="107" text-anchor="end" font-size="16" style="fill:var(--ink)">RSST <tspan style="fill:var(--muted)" font-size="12">2024</tspan></text>
+<line x1="203.2" y1="102" x2="368.2" y2="102" stroke="var(--gold)" stroke-width="3" opacity=".45"/>
+<circle cx="203.2" cy="102" r="6" fill="var(--paper)" stroke="var(--gold)" stroke-width="2.5"/>
+<circle cx="368.2" cy="102" r="7" style="fill:var(--gold)"/>
+<text x="380.2" y="107" font-size="15" font-weight="700" style="fill:var(--gold)">47.4</text>
+</g>
+<g class="frag" data-frag="2">
+<text x="8" y="144" font-size="13" font-weight="700" letter-spacing=".08em" style="fill:var(--green)">2 · ENCODE</text>
+<text x="138" y="163" text-anchor="end" font-size="16" style="fill:var(--ink)">HDE <tspan style="fill:var(--muted)" font-size="12">2020</tspan></text>
+<line x1="172.5" y1="158" x2="304.1" y2="158" stroke="var(--green)" stroke-width="3" opacity=".45"/>
+<circle cx="172.5" cy="158" r="6" fill="var(--paper)" stroke="var(--green)" stroke-width="2.5"/>
+<circle cx="304.1" cy="158" r="7" style="fill:var(--green)"/>
+<text x="316.1" y="163" font-size="15" font-weight="700" style="fill:var(--green)">33.5</text>
+<text x="138" y="191" text-anchor="end" font-size="16" style="fill:var(--ink)">HierCode <tspan style="fill:var(--muted)" font-size="12">2025</tspan></text>
+<line x1="178.6" y1="186" x2="408.6" y2="186" stroke="var(--green)" stroke-width="3" opacity=".45"/>
+<circle cx="178.6" cy="186" r="6" fill="var(--paper)" stroke="var(--green)" stroke-width="2.5"/>
+<circle cx="408.6" cy="186" r="7" style="fill:var(--green)"/>
+<text x="420.6" y="191" font-size="15" font-weight="700" style="fill:var(--green)">56.2</text>
+<text x="138" y="219" text-anchor="end" font-size="16" style="fill:var(--ink)">JRED <tspan style="fill:var(--muted)" font-size="12">2025</tspan></text>
+<line x1="265.9" y1="214" x2="408.8" y2="214" stroke="var(--green)" stroke-width="3" opacity=".45"/>
+<circle cx="265.9" cy="214" r="6" fill="var(--paper)" stroke="var(--green)" stroke-width="2.5"/>
+<circle cx="408.8" cy="214" r="7" style="fill:var(--green)"/>
+<text x="420.8" y="219" font-size="15" font-weight="700" style="fill:var(--green)">56.3</text>
+</g>
+<g class="frag" data-frag="3">
+<text x="8" y="256" font-size="13" font-weight="700" letter-spacing=".08em" style="fill:var(--blue)">3 · ALIGN</text>
+<text x="138" y="275" text-anchor="end" font-size="16" style="fill:var(--ink)">CCR-CLIP <tspan style="fill:var(--muted)" font-size="12">2023</tspan></text>
+<line x1="250.2" y1="270" x2="485.7" y2="270" stroke="var(--blue)" stroke-width="3" opacity=".45"/>
+<circle cx="250.2" cy="270" r="6" fill="var(--paper)" stroke="var(--blue)" stroke-width="2.5"/>
+<circle cx="485.7" cy="270" r="7" style="fill:var(--blue)"/>
+<text x="497.7" y="275" font-size="15" font-weight="700" style="fill:var(--blue)">73.0</text>
+<text x="138" y="303" text-anchor="end" font-size="16" style="fill:var(--ink)">FT-CLIP <tspan style="fill:var(--muted)" font-size="12">2025</tspan></text>
+<line x1="270.4" y1="298" x2="513.2" y2="298" stroke="var(--blue)" stroke-width="3" opacity=".45"/>
+<circle cx="270.4" cy="298" r="6" fill="var(--paper)" stroke="var(--blue)" stroke-width="2.5"/>
+<circle cx="513.2" cy="298" r="7" style="fill:var(--blue)"/>
+<text x="525.2" y="303" font-size="15" font-weight="700" style="fill:var(--blue)">79.0</text>
+<text x="138" y="331" text-anchor="end" font-size="16" style="fill:var(--ink)">GRSTR <tspan style="fill:var(--muted)" font-size="12">2026</tspan></text>
+<line x1="301.2" y1="326" x2="520.9" y2="326" stroke="var(--blue)" stroke-width="3" opacity=".45"/>
+<circle cx="301.2" cy="326" r="6" fill="var(--paper)" stroke="var(--blue)" stroke-width="2.5"/>
+<circle cx="520.9" cy="326" r="7" style="fill:var(--blue)"/>
+<text x="532.9" y="331" font-size="15" font-weight="700" style="fill:var(--blue)">80.6</text>
+<text x="138" y="359" text-anchor="end" font-size="16" style="fill:var(--ink)">Hi-GITA <tspan style="fill:var(--muted)" font-size="12">2025</tspan></text>
+<line x1="358.6" y1="354" x2="542.7" y2="354" stroke="var(--blue)" stroke-width="3" opacity=".45"/>
+<circle cx="358.6" cy="354" r="6" fill="var(--paper)" stroke="var(--blue)" stroke-width="2.5"/>
+<circle cx="542.7" cy="354" r="7" style="fill:var(--blue)"/>
+<text x="554.7" y="359" font-size="15" font-weight="700" style="fill:var(--blue)">85.4</text>
+</g>
+<g class="frag" data-frag="4">
+<text x="8" y="396" font-size="13" font-weight="700" letter-spacing=".08em" style="fill:var(--accent)">4 · FONT MATCH (OTHER PROTOCOL)</text>
+<text x="138" y="415" text-anchor="end" font-size="16" style="fill:var(--ink)">OpenCCD <tspan style="fill:var(--muted)" font-size="12">2022</tspan></text>
+<line x1="568.3" y1="410" x2="589.5" y2="410" stroke="var(--accent)" stroke-width="3" opacity=".45" stroke-dasharray="5 4"/>
+<circle cx="568.3" cy="410" r="6" fill="var(--paper)" stroke="var(--accent)" stroke-width="2.5"/>
+<circle cx="589.5" cy="410" r="7" style="fill:var(--accent)"/>
+<text x="601.5" y="415" font-size="15" font-weight="700" style="fill:var(--accent)">95.5 at m=2,000</text>
+</g>
+</svg>
+
+      <p class="src" style="font-size:12px">HWDB &rarr; ICDAR 2013, Top-1. GRSTR, GL-HPN, Hi-GITA, OpenCCD tables. Dashed: given a printed glyph per unseen class.</p>
+    </div>
+    <div class="col mid">
+      <div class="finds">
+        <div class="find frag" data-frag="5"><div class="q">+25</div><div class="t"><b>points.</b> The
+          first CLIP-style model beat six years of predictors.</div></div>
+        <div class="find frag" data-frag="6"><div class="q">5,400&times;</div><div class="t"><b>faster.</b>
+          Decoding: 1,666 ms per image. Retrieval: 0.31 ms.</div></div>
+        <div class="find frag" data-frag="7"><div class="q">10&times;</div><div class="t">How finely you
+          split into radicals: <b>+27 pts</b>. A better backbone: <b>+2.7</b>.</div></div>
+      </div>
+    </div>
+  </div></div>
+  <aside class="notes">1:30. Click per family: predictors at the bottom, codes in the middle,
+    alignment on top. Hollow dot = 500 training classes, the hard case; filled = 2,755.
+    Click: +25 points between best predictor (RSST 47.4) and first aligner (CCR-CLIP 73.0),
+    a paradigm gap, not tuning. Click: and it's 5,400x faster (DenseRAN 1,666 ms vs FT-CLIP
+    0.31 ms). Click: the tree's granularity mattered ten times more than the backbone
+    (GRSTR on AHCDB: coarse→fine +27.4, ResNet-c→b +2.7). Click 4 (before the punchlines):
+    font matching, OpenCCD 90.9 at m=500, but it is handed a printed image of every unseen
+    class, which is extra information; MegaHan's common protocol (next) puts it at 76, below CLIP. If asked: CoLa 2025 learns its
+    own components and reaches 68.6 at m=500; dual-head methods trade closed-set accuracy.</aside>
+</section>
+
+<!-- 9b · MEGAHAN97K (0:40) =============================================== -->
+<section class="slide" data-fx="arcade:glitch">
+  <div class="kicker">At scale &middot; MegaHan97K (Pattern Recognition, 2025)</div>
+  <h1>97,455 classes: <span class="thin">only the learned matchers hold up</span></h1>
+  <div class="body"><div class="cols">
+    <div class="col mid" style="flex:1.3">
+      <p class="xs dim">Train on the 27,533 common characters &rarr; test on <b>69,922 never seen</b>. Top-1 (%).</p>
+      <div class="mt-s">
+<div class="hbar f-pred"><span>FewShotRAN</span><div class="t" style="width:58.5%"></div><span class="v">46.8</span></div>
+<div class="hbar f-emb"><span>HDE</span><div class="t" style="width:59.2%"></div><span class="v">47.4</span></div>
+<div class="hbar f-emb"><span>RIE</span><div class="t" style="width:56.8%"></div><span class="v">45.4</span></div>
+<div class="hbar f-emb"><span>SideNet</span><div class="t" style="width:59.6%"></div><span class="v">47.7</span></div>
+<div class="hbar f-emb"><span>HierCode</span><div class="t" style="width:58.5%"></div><span class="v">46.8</span></div>
+<div class="hbar f-font"><span>OpenCCD</span><div class="t" style="width:95.1%"></div><span class="v">76.1</span></div>
+<div class="hbar f-font"><span>PCSS</span><div class="t" style="width:96.7%"></div><span class="v">77.3</span></div>
+<div class="hbar f-ali"><span>CCR-CLIP</span><div class="t" style="width:98.8%"></div><span class="v">79.0</span></div>
+      </div>
+      <div class="tagrow mt-s"><span class="tag f-pred">predict</span><span class="tag f-emb">encode</span><span class="tag f-ali">align</span><span class="tag f-font">font match</span></div>
+    </div>
+    <div class="col mid">
+      <div class="finds">
+        <div class="find frag"><div class="q">&asymp;47</div><div class="t"><b>Every fixed code lands at the same place</b>,
+          whatever its design. Many test characters contain radicals never seen in training.</div></div>
+        <div class="find frag"><div class="q">79</div><div class="t"><b>CLIP on the tree still wins</b>, +31 pts over the best code;
+          font matching is close behind (76&ndash;77).</div></div>
+      </div>
+    </div>
+  </div></div>
+  <aside class="notes">0:40. The 2025 dataset with almost every encoded Han character. Its
+    authors re-ran eight methods under one protocol (Table 10). Fixed codes all collapse to
+    about 47, whatever the design; CLIP-style alignment 79; matching to fonts 76–77, but it
+    needs printed glyphs. Same ranking as on handwriting, at 70 times more unseen classes.
+    Hi-GITA, GRSTR, FT-CLIP were not in their benchmark.</aside>
+</section>
+
+<!-- 9 · WHERE I FIT (1:00) ================================================ -->
+<section class="slide" data-fx="bowling:turkey">
+  <div class="kicker">Where my work fits</div>
+  <h1>A learned embedding, <span class="thin">used to fix a reader's mistakes</span></h1>
+  <div class="body"><div class="cols">
+    <div class="col mid" style="flex:0.8">
+      <ul class="b tight">
+        <li>I train a <b>contrastive glyph encoder</b>, family 3's recipe on the image side.</li>
+        <li>Each glyph's nearest neighbours vote on its label: a <b>graph</b> over the whole book.</li>
+      </ul>
+      <h5 class="smaller mt" style="color:var(--accent)">What the graph is for</h5>
+      <ol class="tight" style="font-size:19px;padding-left:26px;margin:0">
+        <li class="frag"><b>Detect errors</b>: a glyph whose reading disagrees with its look-alikes.</li>
+        <li class="frag"><b>Catch hallucinations</b>: the reader writes a plausible character that is not on the page.</li>
+        <li class="frag"><b>Expose model conventions</b>: one reader writes the Taiwan form, another the Hong Kong form, of the same glyph.</li>
+      </ol>
+      <p class="xs dim mt-s">Run on a real Qing-dynasty volume: 770 pages, no ground truth.</p>
+    </div>
+    <div class="col mid">
+      <figure class="fig"><img src="figures/doc611_corrections.png" alt="24 glyphs corrected on
+        volume 611: original reading, correction, and a second reader's verdict"
+        style="max-height:420px">
+        <figcaption>Corrections kept on volume 611. Blue: a second, independent reader agrees.</figcaption></figure>
+    </div>
+  </div></div>
+  <aside class="notes">1:00. My thesis uses this literature from the other end: I don't need
+    to name unseen characters, I need glyphs of the same character to land close together,
+    and I use that to vote out OCR errors. Blue: an independent OCR agrees with the fix.
+    On the benchmark the encoder beat hand-crafted features (+0.42 pt). End: the radical
+    tree could say which corrections are plausible. Three uses, click each: errors; hallucinations,
+    which a vision-language reader produces and which look fluent; and conventions, e.g. 為/爲 or
+    TW vs HK standard forms, which a CER counts as errors though nothing was misread.
+    Thanks, questions.</aside>
+</section>
+
+<!-- 13 · THANKS ============================================================ -->
+<section class="slide dark" data-fx="arcade:crt">
+  <div class="vstrip">謝謝</div>
+  <div class="body" style="justify-content:center;align-items:center">
+    <div class="thanks"><h1>Thank you for your attention</h1></div>
+    <div style="font-size:24px;color:#cfc6b4;margin-top:28px">Questions?</div>
+  </div>
+  <aside class="notes">The title jumps in with a backflip. Questions: backups are in the old
+    deck (slides_2026-09-11): SSL overview, CoLa, AnandaSky, detection.</aside>
+</section>
+
+</div>
+
+<script src="assets/katex/katex.min.js"></script>
+<script src="assets/katex/contrib/auto-render.min.js"></script>
+<script src="assets/deck.js"></script>
+</body>
+</html>

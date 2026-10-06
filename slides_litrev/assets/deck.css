@@ -1,0 +1,1096 @@
+/* ==========================================================================
+   deck.css -- the design system of the 1280x720 HTML decks in documents/.
+
+   Every deck folder carries its own copy (assets/deck.css), so a finished talk
+   never reflows when this file moves on. To upgrade an old deck, copy the new
+   file over and run tools/check_overflow.py on it. Rules for one deck only go
+   in that deck's <style> in <head>, not here.
+
+   Contents, in sheet order
+     tokens ............. :root colours, washes, font stacks
+     slide scaffold ..... .slide .kicker h1-h6 .body .cols .col(.mid .auto)
+     footer ............. .foot .fsec .fnum (stamped by deck.js)
+     text ............... ul.b .acc .blue .green .gold .dim .cjk p, links a.url,
+                          .note .takeline (.sm), blockquote, maths .m .mr .eq
+     figures ............ figure.fig (.bare) .src, ol.refs
+     tables ............. table.tbl .dense .xsm .bars td.v td.na td.meth
+     numbers ............ .stats(.stack) .stat .finds .find
+     cards & tags ....... .cards .card(.sm) .tag .tagrow .fc-accent/blue/green/gold/ink
+     dark slides ........ .slide.dark .vstrip .titlebox, ol.agenda (.pg .nonum)
+     steps, code, svg ... .steps .step pre.code .diagram svg .box .edge .head
+     runtime ............ #ui #bar #help, builds .frag, transitions .fx-*, #toast,
+                          aside.notes, overview
+                          #sorter, #jump, speaker view #pv, key list #keys,
+                          authoring mode body.dev #dev
+     utilities .......... .big .small .smaller .xs .xxs .mt-s .mt .mt-l .nogrow
+     print
+   ========================================================================== */
+:root{
+  --paper:#faf7f0;
+  --paper2:#f3eee2;
+  --ink:#211d19;
+  --ink2:#4d463d;
+  --muted:#8a8071;
+  --accent:#b3432e;        /* vermillion / seal red */
+  --accent-dark:#8c3323;
+  --blue:#2b4a6f;
+  --green:#3d7a5a;
+  --gold:#b78a2e;
+  --line:#d9d0bd;
+  /* light washes of the four hues: bar fills and tints, never text */
+  --accent-w:#f2dcd5;
+  --blue-w:#d6e0ea;
+  --green-w:#d8e8df;
+  --gold-w:#efe3c4;
+  --ink-w:#e2ddd2;
+  --serif:'Source Serif 4','Source Serif Pro','Noto Serif',Georgia,'Times New Roman',serif;   /* Source Serif 4 is NOT installed here -> Noto Serif is what you actually get */
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans','Helvetica Neue',Arial,sans-serif;
+  --cjk:'Noto Sans CJK SC','Noto Sans CJK TC','Noto Sans SC',sans-serif;
+  --mono:ui-monospace,'JetBrains Mono','Fira Code','DejaVu Sans Mono',Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:#14110d;
+  font-family:var(--sans);
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#deck{
+  width:1280px;height:720px;
+  position:relative;
+  transform-origin:center center;
+}
+/* ---------------- slide scaffold ---------------- */
+.slide{
+  position:absolute;inset:0;
+  width:1280px;height:720px;
+  background:var(--paper);
+  display:none;
+  flex-direction:column;
+  padding:54px 72px 46px 72px;
+  overflow:hidden;
+}
+.slide.active{display:flex}
+.kicker{
+  font-family:var(--sans);
+  font-size:15px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;
+  margin-bottom:10px;
+}
+/* ---------------- heading scale ----------------
+   h1-h3 are display type (serif), h4-h6 are labels (sans) -- the same split the
+   deck already makes between display and UI text. Sizes are absolute px on
+   purpose: the slide is a fixed 1280x720 box, so a relative em scale would only
+   make the numbers harder to reason about.
+     h1 44  slide title            (58 on .titlebox, set below)
+     h2 30  a second block on a slide that has two
+     h3 23  panel / card heading
+     h4 19  label over a table or figure group
+     h5 16  small label
+     h6 13  uppercase micro-label -- distinct from .kicker, which is accent
+            coloured and belongs above the h1, not inside the body
+   Every level takes .thin for a de-emphasised second half. */
+.slide h1{
+  font-family:var(--serif);
+  font-size:44px;line-height:1.12;font-weight:700;
+  color:var(--ink);
+  margin-bottom:26px;
+}
+.slide h2{
+  font-family:var(--serif);
+  font-size:30px;line-height:1.18;font-weight:700;
+  color:var(--ink);margin-bottom:14px;
+}
+.slide h3{
+  font-family:var(--serif);
+  font-size:23px;line-height:1.25;font-weight:700;
+  color:var(--ink);margin-bottom:10px;
+}
+.slide h4{
+  font-family:var(--sans);
+  font-size:19px;line-height:1.3;font-weight:700;
+  color:var(--ink);margin-bottom:8px;
+}
+.slide h5{
+  font-family:var(--sans);
+  font-size:16px;line-height:1.3;font-weight:700;
+  color:var(--ink2);margin-bottom:6px;
+}
+.slide h6{
+  font-family:var(--sans);
+  font-size:13px;line-height:1.3;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.16em;
+  margin-bottom:6px;
+}
+.slide :is(h1,h2,h3,h4,h5,h6) .thin{font-weight:400;color:var(--ink2)}
+/* Containers that space their own children (flex gap or padding) must not also
+   collect the heading's bottom margin. */
+.card>:is(h1,h2,h3,h4,h5,h6),
+.note>:is(h1,h2,h3,h4,h5,h6),
+.stat>:is(h1,h2,h3,h4,h5,h6),
+figure.fig>:is(h1,h2,h3,h4,h5,h6){margin-bottom:0}
+.body{flex:1;min-height:0;display:flex;flex-direction:column}
+.cols{display:flex;gap:44px;flex:1;min-height:0;align-items:stretch}
+.cols.narrow{gap:26px}
+/* A .col takes an equal share; weight one with style="flex:1.3". .mid centres
+   its content vertically -- the most common column in every deck so far. */
+.col{flex:1;min-width:0;display:flex;flex-direction:column}
+.col.mid{justify-content:center}
+.col.auto{flex:0 1 auto}   /* sized by its content, shrinks if it must (the old .col default) */
+.grow{flex:1}
+/* footer stamped by JS */
+.foot{
+  position:absolute;left:72px;right:72px;bottom:18px;
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:8px;
+}
+.foot .fnum{font-variant-numeric:tabular-nums}
+/* the current section, from data-section on this slide or an earlier one */
+.foot .fsec{margin-right:14px;padding-right:14px;border-right:1px solid var(--line)}
+.slide.dark .foot .fsec{border-right-color:#453d33}
+/* ---------------- typography helpers ---------------- */
+ul.b{list-style:none;font-size:22px;line-height:1.5;color:var(--ink2)}
+ul.b>li{padding-left:26px;position:relative;margin-bottom:14px}
+ul.b>li::before{content:'';position:absolute;left:2px;top:.62em;width:10px;height:10px;background:var(--accent);border-radius:2px;transform:rotate(45deg)}
+ul.b>li>strong{color:var(--ink)}
+ul.b ul{list-style:none;margin-top:8px;font-size:calc(1em * 20 / 22)}   /* 20px under a 22px list; relative, so a size utility on the list scales it too */
+ul.b ul>li{padding-left:20px;position:relative;margin-bottom:6px}
+/* .tight: same bullets, less air between them -- for a list that has to share a
+   column with an equation or a note. Reach for this before shrinking the type. */
+ul.b.tight>li{margin-bottom:7px}
+ul.b.tight ul>li{margin-bottom:3px}
+ul.b ul>li::before{content:'–';position:absolute;left:0;color:var(--accent)}
+/* .big / .small and the other size utilities live at the END of the sheet */
+.cjk{font-family:var(--cjk)}
+.acc{color:var(--accent);font-weight:700}
+.blue{color:var(--blue);font-weight:600}
+.green{color:var(--green);font-weight:600}
+.gold{color:var(--gold);font-weight:600}
+.dim{color:var(--muted)}
+/* Bare paragraphs. :where() keeps this at element specificity, so .dim, .acc
+   or a size utility on the <p> still wins. */
+:where(.slide) p{color:var(--ink2);line-height:1.45}
+:where(.slide.dark) p{color:#cfc6b4}
+/* ---------------- links ----------------
+   The click-to-advance handler at the bottom of the file already bails on any
+   click that lands inside an <a>, so following a link never also flips the
+   slide -- do not remove that guard. Chromium keeps <a href> as a clickable
+   annotation in the exported PDF, so links survive `export_pdf.py`.
+     <a href="https://..." target="_blank" rel="noopener">text</a>   external
+     <a href="#7">slide 7</a>                                        deep link
+     <a class="url" href="...">runs/encoder_eval/2026-09-11</a>      literal path
+   Always give an external link target="_blank": without it you navigate the
+   deck away mid-talk. */
+a{
+  color:var(--accent);text-decoration:none;
+  border-bottom:1px solid rgba(179,67,46,.35);
+  transition:color .15s,border-color .15s;
+}
+a:hover{color:var(--accent-dark);border-bottom-color:var(--accent-dark)}
+.slide.dark a{color:#e0956f;border-bottom-color:rgba(224,149,111,.42)}
+.slide.dark a:hover{color:#f0b48f;border-bottom-color:#f0b48f}
+/* a path or URL shown literally rather than as prose */
+a.url{font-family:var(--mono);font-size:.92em;color:var(--blue);border-bottom:none}
+.slide.dark a.url{color:#9dbdd8}
+.note{
+  font-size:17px;color:var(--ink2);
+  background:var(--paper2);border-left:4px solid var(--accent);
+  padding:12px 16px;border-radius:0 8px 8px 0;
+  line-height:1.45;
+}
+.takeline{
+  margin-top:auto;
+  font-family:var(--serif);font-size:22px;font-style:italic;color:var(--accent-dark);
+  border-top:1px solid var(--line);padding-top:14px;
+}
+/* .sm: the compact note / takeline, for a slide already carrying a table or figure */
+.note.sm{font-size:15px;padding:10px 14px;line-height:1.4}
+.takeline.sm{font-size:19px;padding-top:11px}
+/* ---------------- block quote ----------------
+   A verbatim passage from a source -- as opposed to .note, which is our own
+   aside. Set in the deck's serif with a hanging rule; no quotation glyphs,
+   since the rule already marks it. <cite> carries the attribution. */
+blockquote{
+  font-family:var(--serif);font-size:19px;line-height:1.45;
+  color:var(--ink2);text-align:left;
+  border-left:3px solid var(--line);
+  padding:2px 0 2px 18px;
+}
+blockquote cite{
+  display:block;margin-top:8px;
+  font-family:var(--sans);font-style:normal;font-size:14px;color:var(--muted);
+}
+blockquote cite::before{content:'\2014\00a0'}
+.slide.dark blockquote{color:#cfc6b4;border-left-color:#453d33}
+/* math (hand-set) */
+.m{font-family:var(--serif);font-style:italic}
+.mr{font-family:var(--serif);font-style:normal}
+.eq{
+  font-family:var(--serif);font-size:24px;color:var(--ink);
+  background:var(--paper2);
+  border:1px solid var(--line);border-radius:10px;
+  padding:16px 22px;text-align:center;line-height:1.6;
+}
+.eq .op{font-style:normal}
+sub,sup{font-size:.68em}
+/* ---------------- KaTeX ----------------
+   Vendored under assets/katex/ (woff2 only) rather than CDN-linked: these decks
+   have to render and print with no network. Delimiters are set in the loader at
+   the bottom of the file -- $...$ and \(...\) inline, $$...$$ and \[...\] display.
+   The hand-set .m / .mr spans still work; use KaTeX when the expression has
+   structure (fractions, sums with limits, matrices) and .m for a lone variable
+   in running prose, which stays in the deck's own serif. */
+.katex{font-size:1.04em}
+/* The global border-box reset breaks KaTeX's internal strut arithmetic. */
+.katex,.katex *{box-sizing:content-box}
+.katex-display{margin:0}                 /* .eq supplies the spacing */
+.slide.dark .katex{color:var(--paper)}
+.eq .katex{font-size:1.1em}
+/* ---------------- figures ---------------- */
+figure.fig{display:flex;flex-direction:column;align-items:center;min-height:0;gap:10px}
+figure.fig img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  background:#fff;border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 2px 10px rgba(33,29,25,.07);
+  padding:8px;
+  min-height:0;
+}
+figure.fig figcaption{font-size:15px;color:var(--muted);text-align:center;line-height:1.35}
+.fig.bare img{background:transparent;border:none;box-shadow:none;padding:0}
+/* .src credits a borrowed figure or claim, in a figcaption or in prose:
+     <span class="src">Caron et al., NeurIPS 2020, fig. 1.</span>   or   <span class="src">[2]</span> */
+.src{color:var(--muted);font-size:.92em;font-style:normal}
+/* ---------------- references ----------------
+   ol.refs numbers itself [1], [2] ... in accent. .ti = title, .ve = venue & year.
+   Two columns by default; ol.refs.one for one. */
+ol.refs{list-style:none;counter-reset:ref;columns:2;column-gap:44px;font-size:15px;line-height:1.4;color:var(--ink2)}
+ol.refs.one{columns:1}
+ol.refs>li{counter-increment:ref;position:relative;padding-left:36px;margin-bottom:10px;break-inside:avoid}
+ol.refs>li::before{
+  content:'[' counter(ref) ']';position:absolute;left:0;top:0;
+  color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;
+}
+ol.refs .ti{font-family:var(--serif);font-style:italic;color:var(--ink)}
+ol.refs .ve{color:var(--muted)}
+/* ---------------- tables ---------------- */
+table.tbl{
+  border-collapse:collapse;width:100%;
+  font-size:19px;font-variant-numeric:tabular-nums;
+  background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+}
+table.tbl th,table.tbl td{padding:8px 14px;text-align:center}
+table.tbl th{
+  background:var(--ink);color:var(--paper);
+  font-weight:600;font-size:17px;letter-spacing:.02em;
+}
+table.tbl td:first-child,table.tbl th:first-child{text-align:left}
+table.tbl tr:nth-child(even) td{background:var(--paper2)}
+table.tbl td.hl{color:var(--accent);font-weight:700}
+table.tbl tr.base td{color:var(--muted);font-style:italic}
+/* density: .dense for a dozen rows, .dense.tight tighter still, .xsm for a
+   backup slide. Reach for these before an inline font-size. */
+table.tbl.dense{font-size:15px}
+table.tbl.dense th,table.tbl.dense td{padding:3px 10px}
+table.tbl.dense th{font-size:13px}
+table.tbl.dense.tight th,table.tbl.dense.tight td{padding:2px 10px}
+table.tbl.xsm{font-size:14px}
+table.tbl.xsm th,table.tbl.xsm td{padding:3px 8px}
+table.tbl.xsm th{font-size:12px}
+/* table.bars: a value bar behind each td.v, in the row's family wash (--w).
+   The script sizes it from the cell text against data-max on the table
+   (default 100; data-decimal="," reads 1,70 as 1.70); a cell with its own
+   style="--v:42" keeps it. td.na = no value
+   (muted, no bar), td.meth = the method name. No image: the number stays text. */
+table.tbl.bars tr:nth-child(even) td{background:transparent}
+table.tbl.bars td.v{position:relative;z-index:0;text-align:right;padding-right:12px}
+table.tbl.bars td.v::before{
+  content:'';position:absolute;inset:2px auto 2px 3px;z-index:-1;
+  width:calc(var(--v,0) * 0.9%);background:var(--w,var(--ink-w));border-radius:2px;
+}
+table.tbl.bars td.v.na::before{display:none}
+table.tbl.bars td.v.na{color:var(--muted)}
+table.tbl.bars td.meth{font-weight:600}
+/* ---------------- stat chips ---------------- */
+.stats{display:flex;gap:20px;flex-wrap:wrap}
+.stats.stack{flex-direction:column}
+.stat{
+  background:#fff;border:1px solid var(--line);border-radius:12px;
+  padding:16px 22px;min-width:150px;flex:1;
+  box-shadow:0 2px 8px rgba(33,29,25,.05);
+}
+.stat .v{font-family:var(--serif);font-size:38px;font-weight:700;color:var(--accent);line-height:1.1}
+.stat .k{font-size:15px;color:var(--ink2);margin-top:4px;line-height:1.3}
+/* finds: a number facing the sentence that explains it -- for 3-5 results that
+   each need a clause, where a .stat would only give them a label */
+.finds{display:flex;flex-direction:column}
+.find{display:flex;gap:22px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line)}
+.find:last-child{border-bottom:none}
+.find .q{
+  font-family:var(--serif);font-size:32px;font-weight:700;color:var(--accent);
+  flex:none;width:120px;text-align:right;font-variant-numeric:tabular-nums;
+}
+.find .t{font-size:17px;line-height:1.42;color:var(--ink2)}
+.find .t b{color:var(--ink)}
+/* cards */
+.cards{display:flex;gap:24px;flex:1;min-height:0}
+.card{
+  flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 2px 10px rgba(33,29,25,.06);min-width:0;
+}
+/* .card h3 is the global h3 above; its margin is zeroed by the flex-gap rule */
+.card .tag{align-self:flex-start}
+.card p{font-size:18px;line-height:1.45;color:var(--ink2)}
+.card .eq{font-size:19px;padding:10px 12px}
+/* .card.sm: four-up cards; the title takes the card's family colour */
+.card.sm{padding:15px 17px;gap:7px}
+.card.sm h3{font-size:20px;color:var(--fc,var(--ink))}
+.card.sm p{font-size:15.5px;line-height:1.42}
+/* ---------------- tags & family colours ----------------
+   A family class sets two custom properties that components read: --fc, the
+   solid hue (a .tag pill, a .card.sm title), and --w, its light wash (the value
+   bar in table.bars). Put it on a .tag, a .card or a <tr>; children inherit.
+   When the families have names, alias them per deck:
+     .f-pred{--fc:var(--gold);--w:var(--gold-w)} */
+.fc-accent{--fc:var(--accent);--w:var(--accent-w)}
+.fc-blue  {--fc:var(--blue);  --w:var(--blue-w)}
+.fc-green {--fc:var(--green); --w:var(--green-w)}
+.fc-gold  {--fc:var(--gold);  --w:var(--gold-w)}
+.fc-ink   {--fc:var(--ink2);  --w:var(--ink-w)}
+.tag{
+  display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;color:#fff;background:var(--fc,var(--ink2));
+}
+.tagrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+/* ---------------- dark (section/title) slides ---------------- */
+.slide.dark{background:linear-gradient(135deg,#211d19 0%,#2c2015 100%);color:var(--paper)}
+.slide.dark :is(h1,h2,h3,h4){color:var(--paper)}
+.slide.dark h5{color:#cfc6b4}
+.slide.dark h6{color:#8a8071}
+.slide.dark :is(h1,h2,h3,h4,h5,h6) .thin{color:#cfc6b4}
+.slide.dark .kicker{color:#e0956f}
+.slide.dark .foot{color:#8a8071;border-top-color:#453d33}
+.vstrip{
+  position:absolute;top:0;bottom:0;right:64px;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:var(--cjk);font-size:74px;letter-spacing:.28em;
+  color:rgba(250,247,240,.10);
+  display:flex;align-items:center;user-select:none;pointer-events:none;
+}
+.slide:not(.dark) .vstrip{color:rgba(33,29,25,.055)}
+/* title slide */
+.titlebox{margin:auto 0;max-width:900px}
+.titlebox .over{font-size:17px;letter-spacing:.3em;text-transform:uppercase;color:#e0956f;font-weight:700;margin-bottom:26px}
+.titlebox h1{font-size:58px;margin-bottom:22px}
+.titlebox .sub{font-family:var(--serif);font-size:26px;font-style:italic;color:#cfc6b4;line-height:1.45;margin-bottom:48px}
+.titlebox .who{font-size:21px;color:var(--paper)}
+.titlebox .who .aff{color:#8a8071;font-size:18px;margin-top:6px}
+/* agenda */
+ol.agenda{list-style:none;counter-reset:ag;font-size:23px;columns:2;column-gap:70px}
+ol.agenda li{
+  counter-increment:ag;margin-bottom:20px;padding-left:56px;position:relative;
+  break-inside:avoid;color:var(--ink);line-height:1.3;
+}
+ol.agenda li::before{
+  content:counter(ag,upper-roman);
+  position:absolute;left:0;top:0;
+  font-family:var(--serif);font-weight:700;font-size:22px;color:var(--accent);
+}
+ol.agenda li .d{display:block;font-size:16px;color:var(--muted);margin-top:2px}
+/* an item that links to a slide (<li><a href="#results">) gets that slide's
+   number, span.pg, from deck.js: flush right on the item's first line, in the
+   item's own type so the baselines agree. .nonum hides them. */
+ol.agenda li a,.slide.dark ol.agenda li a{color:inherit;border-bottom:none}
+ol.agenda li .pg{float:right;margin-left:18px;color:var(--muted);font-variant-numeric:tabular-nums}
+.slide.dark ol.agenda li .pg{color:#8a8071}
+ol.agenda.nonum .pg{display:none}
+/* pipeline step list */
+.steps{display:flex;flex-direction:column;gap:9px}
+/* The overview runs long; it alone needs slightly tighter leading. */
+#overview .steps{gap:10px}
+/* The body of a step is running prose, so it must stay in normal inline flow —
+   a flex container here promotes every <strong>/<em>/<span> to its own column. */
+.step{
+  font-size:19px;line-height:1.45;color:var(--ink2);
+  padding-left:32px;position:relative;
+}
+.step .n{
+  flex:none;width:30px;height:30px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;align-self:center;
+}
+.step b{color:var(--ink)}
+.step>b:first-child{
+  position:absolute;left:0;top:0;width:24px;
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+/* code block */
+pre.code{
+  font-family:var(--mono);font-size:15px;line-height:1.5;
+  color:var(--ink);background:var(--paper2);
+  border:1px solid var(--line);border-radius:10px;
+  padding:12px 16px;margin-top:14px;overflow-x:auto;
+}
+pre.code b{color:var(--accent)}
+/* ---------------- svg diagrams ----------------
+   Hand-drawn inline SVG styled by class, never by fill="#hex", so a diagram
+   follows the :root tokens like the rest of the slide. Arrowheads are a
+   <marker> whose path takes .head (.head.acc for an accent edge). Give the
+   <svg> width:100% plus a max-height, and set font-size on it in viewBox units.
+   Ids inside are fine: the overview / presenter clones rename them. */
+.diagram{display:flex;flex-direction:column;align-items:center;gap:8px}
+.diagram .cap{font-size:15px;color:var(--muted);text-align:center}
+.diagram svg{font-family:var(--sans)}
+.diagram svg text{fill:var(--ink2)}
+.diagram svg text.t{fill:var(--ink);font-weight:600}
+.diagram svg text.lbl{fill:var(--muted)}
+.diagram svg text.acc{fill:var(--accent)}
+.diagram svg .box{fill:#fff;stroke:var(--line);stroke-width:1.5}
+.diagram svg .box.soft{fill:var(--paper2)}
+.diagram svg .box.acc{fill:var(--accent-w);stroke:var(--accent)}
+.diagram svg .box.blue{fill:var(--blue-w);stroke:var(--blue)}
+.diagram svg .edge{fill:none;stroke:var(--ink2);stroke-width:1.6}
+.diagram svg .edge.acc{stroke:var(--accent);stroke-width:2.2}
+.diagram svg .edge.dash{stroke-dasharray:6 5}
+.diagram svg .head{fill:var(--ink2)}
+.diagram svg .head.acc{fill:var(--accent)}
+/* keyboard help + progress UI (screen only) */
+#ui{position:fixed;left:0;right:0;bottom:0;pointer-events:none;z-index:50}
+#bar{height:4px;background:var(--accent);width:0%;transition:width .2s}
+#help{
+  position:fixed;top:14px;right:16px;color:rgba(250,247,240,.4);
+  font-size:12px;font-family:var(--mono);z-index:50;pointer-events:none;
+}
+/* ---------------- builds ----------------
+   .frag elements appear one per forward keypress before the deck moves on;
+   the back key hides them again, and arriving from the next slide shows them
+   all. data-frag="n" orders and groups builds; without it, a .frag's number is
+   its position among the slide's .frag elements. .then-dim fades a build once a
+   later one shows. Hidden by opacity, never display, so the slide has the same
+   geometry in every state: check_overflow.py measures the fully built slide,
+   and the PDF prints every build. */
+.frag{opacity:0;transition:opacity .28s ease}
+.frag:not(.on){pointer-events:none}
+.frag.on{opacity:1}
+.frag.then-dim.past{opacity:.38}
+/* ---------------- transitions (T) ----------------
+   deck.js animates the real slides (Web Animations): the outgoing slide stays
+   shown while it leaves, .fx-layer above both holds the tiles and the props
+   (ball, pins, Pac-Man, curtains, splats, cheers, confetti), .fx-under sits
+   below both, and the sober set is clipped to the slide frame. The --fx-*
+   colours belong to the fun sets alone: deliberately loud, never content. */
+:root{
+  --fx-1:#ff2e88; --fx-2:#ffd400; --fx-3:#00d4ff; --fx-4:#7cff4f; --fx-5:#ff7a00; --fx-6:#b36bff;
+  --fx-night:#1b0b33; --fx-ball:#3d1a6e; --fx-pin:#fbfbf5;
+  --fx-steel:#6b7079; --fx-steel-dark:#2a2d33;
+  --fx-velvet:#a3182b; --fx-velvet-dark:#4a0710; --fx-trim:#d4a640;
+  --fx-sepia-1:#e8dfca; --fx-sepia-2:#a8997c; --fx-sepia-3:#3b3327; --fx-film:#0c0a08;
+  --fx-cloud:#ffffff; --fx-cloud-edge:#c9d2dc;
+  --fx-snake:#35c24a; --fx-snake-dark:#1c7a2b; --fx-red:#d7263d; --fx-black:#000000;
+  --fx-win-1:#2458d6; --fx-win-2:#6c9cf2; --fx-dialog:#ecebe6; --fx-stonks-1:#0b1a3a; --fx-stonks-2:#1a2f66; --fx-illu:#2a2140;
+  --fx-impact:Impact,Anton,Haettenschweiler,'Arial Narrow Bold','Liberation Sans Narrow','DejaVu Sans Condensed',sans-serif;
+  --fx-comic:'Comic Sans MS','Comic Neue','Chalkboard SE','Comic Relief',cursive;
+  --fx-outline:3px 3px 0 var(--fx-black),-3px 3px 0 var(--fx-black),3px -3px 0 var(--fx-black),-3px -3px 0 var(--fx-black),
+               0 3px 0 var(--fx-black),0 -3px 0 var(--fx-black),3px 0 0 var(--fx-black),-3px 0 0 var(--fx-black);
+}
+.slide.fx-out{display:flex}
+#deck.fx-clip{overflow:hidden}
+.fx-layer{position:absolute;inset:0;z-index:4;pointer-events:none}
+.fx-layer>.slide,.fx-piece{will-change:transform,opacity}
+/* a clipped copy of a slide (tile, half, torn piece) travels inside a .fx-piece;
+   in the fun sets its shadow gives the pieces some depth over the slide below */
+.fx-piece{position:absolute;left:0;top:0;overflow:hidden}
+.fx-piece.shadow{filter:drop-shadow(0 12px 16px rgba(0,0,0,.42))}
+.fx-flash{position:absolute;inset:0;background:#fff}
+.fx-ball{
+  position:absolute;left:0;top:0;width:120px;height:120px;border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 26%,rgba(255,255,255,.6) 0 5%,rgba(255,255,255,0) 20%),
+    radial-gradient(circle at 44% 40%,var(--fx-night) 0 6%,transparent 7%),
+    radial-gradient(circle at 60% 36%,var(--fx-night) 0 6%,transparent 7%),
+    radial-gradient(circle at 54% 58%,var(--fx-night) 0 7%,transparent 8%),
+    radial-gradient(circle at 65% 70%,var(--fx-6),var(--fx-ball) 55%,var(--fx-night));
+  box-shadow:0 0 28px rgba(0,0,0,.45);
+}
+.fx-banner{
+  position:absolute;left:50%;top:50%;white-space:nowrap;
+  font:italic 900 150px/1.1 var(--sans);letter-spacing:-.01em;padding:0 .12em;
+  background:linear-gradient(180deg,#fff 0%,var(--fx-2) 30%,var(--fx-5) 60%,var(--fx-1) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:5px var(--fx-night);
+  filter:drop-shadow(0 9px 0 var(--fx-night)) drop-shadow(0 0 34px var(--fx-2));
+}
+.fx-bit{position:absolute;width:12px;height:18px;margin:-9px 0 0 -6px;border-radius:2px}
+.fx-c0{background:var(--fx-1)} .fx-c1{background:var(--fx-2)} .fx-c2{background:var(--fx-3)}
+.fx-c3{background:var(--fx-4)} .fx-c4{background:var(--fx-5)} .fx-c5{background:var(--fx-6)}
+.fx-c6{background:var(--fx-night)}
+.fx-under{z-index:0}
+/* bowling */
+.fx-pin{position:absolute;width:52px;height:143px}
+.fx-pin svg{display:block;width:100%;height:100%}
+.fx-pin path{fill:var(--fx-pin);stroke:var(--fx-night);stroke-width:1.5}
+.fx-pin rect{fill:var(--fx-1)}
+.fx-sweep{
+  position:absolute;left:-40px;top:0;width:1360px;height:80px;
+  background:repeating-linear-gradient(45deg,var(--fx-2) 0 22px,var(--fx-night) 22px 44px) bottom/100% 18px no-repeat,
+             linear-gradient(180deg,var(--fx-steel),var(--fx-steel-dark));
+  box-shadow:0 12px 26px rgba(0,0,0,.5);
+}
+.fx-banner.fx-x{font-size:260px;font-style:normal}
+/* arcade */
+.fx-px{position:absolute;width:80px;height:80px}
+.fx-bit.fx-sq{width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:0}
+.fx-banner.fx-arcade{
+  font:700 92px/1.1 var(--mono);letter-spacing:.06em;font-style:normal;
+  background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--fx-2);
+  -webkit-text-stroke:0;text-shadow:6px 6px 0 var(--fx-1),12px 12px 0 var(--fx-6);filter:none;
+}
+.fx-pellet{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--fx-pin);box-shadow:0 0 12px var(--fx-2)}
+.fx-pac{position:absolute;left:0;width:300px;height:300px}
+.fx-pac i{
+  position:absolute;left:0;width:300px;height:150px;
+  background:radial-gradient(circle at 56% 42%,var(--fx-night) 0 9%,transparent 10%),var(--fx-2);
+}
+.fx-pac i:first-child{top:0;border-radius:150px 150px 0 0;transform-origin:50% 100%}
+.fx-pac i:last-child{top:150px;border-radius:0 0 150px 150px;transform-origin:50% 0;background:var(--fx-2)}
+.fx-ghost{
+  position:absolute;left:0;width:240px;height:260px;border-radius:120px 120px 0 0;
+  background:
+    radial-gradient(circle at 42% 40%,var(--fx-night) 0 5%,transparent 6%),
+    radial-gradient(circle at 72% 40%,var(--fx-night) 0 5%,transparent 6%),
+    radial-gradient(circle at 36% 40%,var(--fx-pin) 0 11%,transparent 12%),
+    radial-gradient(circle at 66% 40%,var(--fx-pin) 0 11%,transparent 12%),
+    var(--g,var(--fx-1));
+  clip-path:polygon(0 0,100% 0,100% 100%,87.5% 88%,75% 100%,62.5% 88%,50% 100%,37.5% 88%,25% 100%,12.5% 88%,0 100%);
+}
+.fx-laser{position:absolute;width:6px;background:var(--fx-1);box-shadow:0 0 14px var(--fx-1)}
+.fx-stage{
+  position:absolute;inset:0;background:var(--fx-night);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;
+  font-family:var(--mono);text-align:center;padding:0 90px;
+}
+.fx-stage b{font-size:104px;letter-spacing:.08em;color:var(--fx-2);text-shadow:6px 6px 0 var(--fx-1)}
+.fx-stage span{font-size:30px;letter-spacing:.06em;color:var(--fx-3);line-height:1.3}
+.fx-stage i{font-style:normal;font-size:34px;color:var(--fx-pin)}
+.fx-snake{
+  position:absolute;left:0;top:0;width:118px;height:110px;border-radius:18px;
+  background:linear-gradient(180deg,var(--fx-snake),var(--fx-snake-dark));box-shadow:0 6px 12px rgba(0,0,0,.3);
+}
+.fx-snake.head{
+  background:
+    radial-gradient(circle at 32% 38%,var(--fx-black) 0 5%,transparent 6%),radial-gradient(circle at 68% 38%,var(--fx-black) 0 5%,transparent 6%),
+    radial-gradient(circle at 32% 38%,var(--fx-pin) 0 12%,transparent 13%),radial-gradient(circle at 68% 38%,var(--fx-pin) 0 12%,transparent 13%),
+    linear-gradient(180deg,var(--fx-snake),var(--fx-snake-dark));
+}
+.fx-apple{position:absolute;width:64px;height:64px;border-radius:50%;background:radial-gradient(circle at 34% 32%,rgba(255,255,255,.55) 0 9%,transparent 11%),var(--fx-red)}
+.fx-apple::after{content:'';position:absolute;left:30px;top:-12px;width:18px;height:12px;border-radius:0 12px;background:var(--fx-snake-dark)}
+.fx-ship{
+  position:absolute;left:0;width:90px;height:64px;background:var(--fx-4);
+  clip-path:polygon(50% 0,62% 40%,100% 70%,100% 100%,0 100%,0 70%,38% 40%);
+}
+/* silent film */
+.fx-leader{position:absolute;inset:0;background:radial-gradient(circle,var(--fx-sepia-1) 0,var(--fx-sepia-2) 70%,var(--fx-sepia-3) 100%);overflow:hidden}
+.fx-leader i{position:absolute;display:block}
+.fx-leader .c1,.fx-leader .c2{left:50%;top:50%;border:6px solid var(--fx-sepia-3);border-radius:50%}
+.fx-leader .c1{width:560px;height:560px;margin:-280px 0 0 -280px}
+.fx-leader .c2{width:440px;height:440px;margin:-220px 0 0 -220px}
+.fx-leader .h{left:0;right:0;top:50%;height:3px;background:var(--fx-sepia-3)}
+.fx-leader .v{top:0;bottom:0;left:50%;width:3px;background:var(--fx-sepia-3)}
+.fx-leader b{position:absolute;left:50%;top:calc(50% - 400px);width:6px;height:400px;margin-left:-3px;background:var(--fx-sepia-3);transform-origin:50% 100%}
+.fx-leader span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 300px/1 var(--serif);color:var(--fx-sepia-3)}
+.fx-curtain{
+  position:absolute;top:0;width:680px;height:720px;
+  background:repeating-linear-gradient(90deg,var(--fx-velvet-dark) 0,var(--fx-velvet) 30px,var(--fx-velvet-dark) 60px);
+  box-shadow:inset 0 -40px 50px rgba(0,0,0,.45);
+}
+.fx-curtain.l{left:0;transform-origin:0 50%}
+.fx-curtain.r{left:600px;transform-origin:100% 50%}
+.fx-valance{
+  position:absolute;left:0;top:0;width:1280px;height:92px;
+  background:linear-gradient(180deg,var(--fx-velvet-dark),var(--fx-velvet) 80%,var(--fx-trim) 80%);
+  box-shadow:0 8px 20px rgba(0,0,0,.5);
+}
+.fx-burn{
+  position:absolute;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle closest-side,transparent 58%,var(--fx-2) 62%,var(--fx-5) 68%,rgba(40,10,0,.85) 76%,transparent 88%);
+}
+.fx-film{
+  position:absolute;left:0;top:-720px;width:1280px;height:2160px;
+  background:
+    repeating-linear-gradient(180deg,var(--fx-sepia-1) 0 22px,transparent 22px 48px) 22px 0/34px 100% no-repeat,
+    repeating-linear-gradient(180deg,var(--fx-sepia-1) 0 22px,transparent 22px 48px) right 22px top 0/34px 100% no-repeat,
+    var(--fx-film);
+}
+.fx-card{position:absolute;inset:0;background:var(--fx-film);display:flex;align-items:center;justify-content:center}
+.fx-card b{
+  display:flex;flex-direction:column;align-items:center;gap:18px;max-width:1000px;text-align:center;
+  font:italic 400 56px/1.25 var(--serif);color:var(--fx-sepia-1);
+  border:4px double var(--fx-sepia-1);outline:1px solid var(--fx-sepia-2);outline-offset:14px;padding:46px 84px;
+}
+.fx-card small{font-size:30px;color:var(--fx-sepia-2)}
+.fx-card small.solo{font-size:56px;color:var(--fx-sepia-1)}
+.fx-scan{position:absolute;inset:0;background:repeating-linear-gradient(180deg,rgba(0,0,0,.2) 0 2px,transparent 2px 4px)}
+.fx-osd{position:absolute;left:64px;top:48px;font:700 46px/1 var(--mono);color:var(--fx-pin);text-shadow:3px 3px 0 rgba(0,0,0,.7)}
+.fx-grain{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(20,12,4,.6) 100%)}
+.fx-scratch{position:absolute;top:0;width:2px;height:720px;background:rgba(255,250,235,.7)}
+/* memes */
+.fx-impact{
+  position:absolute;left:40px;right:40px;text-align:center;font:700 80px/1.05 var(--fx-impact);letter-spacing:.01em;
+  text-transform:uppercase;color:var(--fx-pin);text-shadow:var(--fx-outline);
+}
+.fx-impact.top{top:26px}
+.fx-impact.bottom{bottom:34px}
+.fx-doge{position:absolute;font:700 48px/1 var(--fx-comic);white-space:nowrap;text-shadow:2px 2px 0 rgba(0,0,0,.25)}
+.fx-t0{color:var(--fx-1)} .fx-t1{color:var(--fx-5)} .fx-t2{color:var(--fx-3)} .fx-t3{color:var(--fx-4)} .fx-t4{color:var(--fx-6)} .fx-t5{color:var(--fx-2)}
+.fx-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.78) 100%)}
+.fx-tbc{
+  position:absolute;left:40px;bottom:64px;padding:20px 44px 20px 96px;
+  background:var(--fx-sepia-1);color:var(--fx-sepia-3);font:italic 700 46px/1 var(--serif);
+  clip-path:polygon(0 50%,76px 0,100% 0,100% 100%,76px 100%);
+}
+.fx-wasted{
+  position:absolute;left:0;right:0;top:50%;height:190px;margin-top:-95px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:linear-gradient(90deg,transparent,rgba(0,0,0,.65) 20%,rgba(0,0,0,.65) 80%,transparent);
+}
+.fx-wasted b{font:700 124px/1 var(--fx-impact);letter-spacing:.04em;color:var(--fx-red);text-shadow:var(--fx-outline)}
+.fx-wasted.passed b{font-size:96px;color:var(--fx-2)}
+.fx-wasted span{font:700 44px/1 var(--fx-impact);color:var(--fx-pin);text-shadow:var(--fx-outline)}
+.fx-stonks{position:absolute;inset:0;background:linear-gradient(180deg,var(--fx-stonks-1),var(--fx-stonks-2))}
+.fx-stonks svg{position:absolute;inset:0;width:100%;height:100%}
+.fx-stonks .grid line{stroke:rgba(255,255,255,.12);stroke-width:1}
+.fx-stonks .line{fill:none;stroke:var(--fx-4);stroke-width:14;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:1 1}
+.fx-stonks .head{fill:var(--fx-4)}
+.fx-stonks.down .line{stroke:var(--fx-red)}
+.fx-stonks.down .head{fill:var(--fx-red)}
+.fx-stonks b{position:absolute;left:80px;top:50px;font:700 130px/1 var(--fx-impact);color:var(--fx-pin);text-shadow:var(--fx-outline);transform-origin:0 50%}
+.fx-glasses{position:absolute;width:540px;height:108px}
+.fx-glasses svg{display:block;width:100%;height:100%}
+.fx-glasses .k{fill:var(--fx-black)}
+.fx-glasses .w{fill:var(--fx-pin)}
+.fx-flame{
+  position:absolute;transform-origin:50% 100%;border-radius:50% 50% 45% 45%/60% 60% 40% 40%;
+  background:radial-gradient(ellipse at 50% 85%,var(--fx-2) 0 22%,var(--fx-5) 45%,var(--fx-1) 62%,transparent 72%);
+}
+.fx-bubble{
+  position:absolute;left:90px;top:80px;padding:22px 38px;transform-origin:15% 100%;
+  background:var(--fx-pin);color:var(--fx-black);border:4px solid var(--fx-black);border-radius:32px;font:700 50px/1.1 var(--fx-comic);
+}
+.fx-bubble::after{content:'';position:absolute;left:60px;bottom:-34px;border:16px solid transparent;border-top:26px solid var(--fx-black);border-bottom:0}
+.fx-illu{
+  position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  background:radial-gradient(circle,var(--fx-illu) 0,var(--fx-black) 75%);
+}
+.fx-illu svg{width:420px;height:380px;filter:drop-shadow(0 0 30px var(--fx-trim))}
+.fx-illu polygon{fill:rgba(212,166,64,.15);stroke:var(--fx-trim);stroke-width:8;stroke-linejoin:round}
+.fx-illu .eye{fill:var(--fx-pin)}
+.fx-illu .iris{fill:var(--fx-3)}
+.fx-illu .pupil{fill:var(--fx-black)}
+.fx-illu b{font:700 64px/1 var(--fx-impact);letter-spacing:.06em;color:var(--fx-trim);text-shadow:0 0 22px var(--fx-trim)}
+.fx-space{position:absolute;inset:0}
+.fx-eject{position:absolute;left:60px;right:60px;top:40%;text-align:center;color:var(--fx-pin);font:400 44px/1.35 var(--sans)}
+.fx-eject span{display:inline-block}
+.fx-eject small{display:block;margin-top:14px;font-size:30px;color:rgba(255,255,255,.65)}
+.fx-err{
+  position:absolute;width:420px;overflow:hidden;background:var(--fx-dialog);border:1px solid var(--fx-win-1);border-radius:8px 8px 4px 4px;
+  box-shadow:4px 6px 14px rgba(0,0,0,.35);font:15px/1.35 var(--sans);color:var(--fx-black);
+}
+.fx-err .bar{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:linear-gradient(180deg,var(--fx-win-2),var(--fx-win-1));color:var(--fx-pin);font-weight:700}
+.fx-err .bar i{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;background:var(--fx-red);font-style:normal;font-size:13px}
+.fx-err .msg{display:flex;gap:14px;align-items:center;padding:16px 18px 8px}
+.fx-err .msg b{position:relative;flex:none;width:38px;height:38px;border-radius:50%;background:var(--fx-red)}
+.fx-err .msg b::after{content:'\2715';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--fx-pin);font-size:20px}
+.fx-err .btn{width:86px;margin:6px 18px 14px auto;padding:3px 0;text-align:center;border:1px solid var(--fx-steel);border-radius:3px;background:var(--fx-pin)}
+.fx-dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.fx-load{
+  position:absolute;left:50%;top:50%;width:580px;margin:-110px 0 0 -290px;padding:30px 36px;border-radius:14px;
+  display:grid;grid-template-columns:48px 1fr;gap:16px 18px;align-items:center;
+  background:var(--fx-night);color:var(--fx-pin);font:22px/1.4 var(--sans);
+}
+.fx-load .spin{width:44px;height:44px;border-radius:50%;border:5px solid rgba(255,255,255,.2);border-top-color:var(--fx-3)}
+.fx-load .track{grid-column:1/-1;height:18px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.12)}
+.fx-load .track i{display:block;height:100%;background:var(--fx-3);transform-origin:0 50%}
+.fx-load .pct{grid-column:1/-1;position:relative;height:30px;font:700 26px/30px var(--mono)}
+.fx-load .pct span{position:absolute;right:0;top:0}
+/* cartoon */
+.fx-banner.fx-comic{
+  padding:130px 170px;font-size:110px;font-style:normal;
+  background:var(--fx-2);-webkit-background-clip:border-box;background-clip:border-box;color:var(--fx-1);
+  -webkit-text-stroke:4px var(--fx-night);filter:none;
+}
+.fx-splat{position:absolute}
+.fx-splat svg{display:block;width:100%;height:100%}
+.fx-splat path,.fx-splat circle{fill:var(--g,var(--fx-1))}
+.fx-puff{position:absolute;border-radius:50%;background:radial-gradient(circle,var(--fx-cloud) 0 45%,var(--fx-cloud-edge) 70%,transparent 72%)}
+.fx-star{position:absolute;font:700 40px/1 var(--sans);color:var(--fx-2);-webkit-text-stroke:2px var(--fx-night);margin:-20px 0 0 -14px}
+.fx-weight{
+  position:absolute;top:0;width:360px;height:260px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:40px;
+  background:linear-gradient(180deg,var(--fx-steel),var(--fx-steel-dark));
+  clip-path:polygon(22% 0,78% 0,100% 100%,0 100%);
+  font:900 64px/1 var(--sans);color:var(--fx-pin);
+}
+#toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:70;pointer-events:none;
+  background:rgba(20,17,13,.92);color:#e8e1d2;border:1px solid #453d33;border-radius:8px;
+  font:13px/1.4 var(--mono);padding:8px 14px;
+}
+#toast[hidden]{display:none}
+/* ---------------- games mode (T until "games") ----------------
+   deck.js puts .game over the current slide inside #deck, so it scales with the
+   deck; .g-view is a window onto a copy of a slide. The look is the deck's own:
+   paper, ink and the seal red, not the loud --fx-* set of the transitions. */
+.game{position:absolute;inset:0;z-index:20;cursor:default;user-select:none}
+.game-board{position:absolute;inset:0;overflow:hidden}
+.game-hud{
+  position:absolute;left:50%;top:12px;transform:translateX(-50%);z-index:5;display:flex;gap:14px;align-items:baseline;white-space:nowrap;
+  padding:7px 16px;border-radius:999px;background:rgba(20,17,13,.9);color:#e8e1d2;font:14px/1.3 var(--mono);box-shadow:0 4px 14px rgba(0,0,0,.3);
+}
+.game-hud b{color:#e0956f;font-size:15px}
+.game-hud i{font-style:normal;color:#8a8071}
+.game-hud em{font-style:normal;color:var(--paper);font-weight:700}
+.game-hud em:empty{display:none}
+.g-view{position:absolute;left:0;top:0;overflow:hidden}
+.g-slide{box-shadow:0 6px 18px rgba(0,0,0,.35);border-radius:4px}
+.g-well,.g-dim{position:absolute;inset:0}
+.g-well{background:#14110d}
+.g-dim{background:rgba(20,17,13,.72)}
+.g-view.g-slide{transition:transform .14s ease-out}
+.g-turn{transform-origin:50% 50%;transition:transform .22s cubic-bezier(.34,1.56,.64,1);cursor:pointer}
+.g-sel{outline:4px solid var(--accent);outline-offset:3px}
+.g-brick{box-shadow:0 3px 8px rgba(0,0,0,.35);border-radius:3px}
+.g-paddle{position:absolute;left:0;top:0;width:220px;height:18px;border-radius:9px;background:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.35)}
+.g-ball{position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff 0 12%,var(--ink) 60%)}
+.g-ring{position:absolute;border-radius:50%;border:6px dashed rgba(250,247,240,.5)}
+.g-ring.hot{border-color:var(--accent);border-style:solid}
+.g-thumb{transform-origin:0 0;cursor:pointer;outline:6px solid var(--paper)}
+.g-lift{box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.g-bar{position:absolute;left:340px;right:340px;bottom:36px;height:16px;border-radius:8px;background:rgba(20,17,13,.6);overflow:hidden}
+.g-bar i{display:block;height:100%;background:var(--accent);transform-origin:0 50%;transform:scaleX(0)}
+.g-sign{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:18px 44px;border-radius:12px;
+  background:rgba(20,17,13,.85);color:var(--paper);font:700 64px/1 var(--serif);white-space:nowrap;
+}
+.g-sign.fire{background:var(--accent);font-size:110px}
+.g-sign.gone{opacity:0;transition:opacity .2s}
+.g-hole{position:absolute;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,#000 0 30%,#3a2f25 42%,rgba(58,47,37,.4) 60%,transparent 70%)}
+.g-card{position:absolute;width:340px;height:191px;perspective:1100px;cursor:pointer;border-radius:10px}
+.g-card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .32s ease}
+.g-card.up .in{transform:rotateY(180deg)}
+.g-card .back,.g-card .front{position:absolute;inset:0;border-radius:10px;overflow:hidden;backface-visibility:hidden;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.g-card .back{
+  display:flex;align-items:center;justify-content:center;color:var(--paper);font:700 72px/1 var(--serif);
+  background:repeating-linear-gradient(45deg,var(--accent) 0 14px,var(--accent-dark) 14px 28px);
+}
+.g-card .front{transform:rotateY(180deg);background:var(--paper)}
+.g-card .front .g-view{width:640px;height:360px}
+.g-say{
+  position:absolute;left:50%;top:50%;z-index:6;padding:14px 40px;border-radius:14px;white-space:nowrap;pointer-events:none;
+  background:rgba(20,17,13,.88);color:var(--paper);font:700 60px/1 var(--serif);
+}
+.g-say.win{background:var(--accent);font-size:90px}
+.g-say.small{top:30%;padding:10px 26px;font-size:40px}
+.g-dust{position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;border-radius:50%;background:rgba(250,247,240,.7);pointer-events:none}
+/* Empilez */
+.g-ghost{opacity:.13;filter:grayscale(1)}
+.g-band{box-shadow:0 10px 24px rgba(0,0,0,.45);outline:3px solid var(--accent);outline-offset:-3px}
+/* Coffre-fort: the old slide is the door, hinged on its left edge */
+.g-door{transform-origin:0 50%;box-shadow:0 0 60px rgba(0,0,0,.6)}
+.g-glow{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 25% 50%,rgba(255,244,214,.95),rgba(255,244,214,0) 65%)}
+.g-lock{
+  position:absolute;left:50%;top:52%;z-index:3;transform:translate(-50%,-50%);padding:16px 24px 22px;border-radius:26px;
+  background:linear-gradient(180deg,var(--fx-steel),var(--fx-steel-dark));box-shadow:0 14px 44px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25);
+}
+.g-lock .lamps{display:flex;justify-content:center;gap:24px;margin-bottom:12px}
+.g-lock .lamps i{width:24px;height:24px;border-radius:50%;background:#2c2721;box-shadow:inset 0 2px 5px rgba(0,0,0,.7);transition:background .15s,box-shadow .15s}
+.g-lock .lamps i.on{background:var(--green);box-shadow:0 0 18px var(--green),inset 0 -2px 4px rgba(0,0,0,.3)}
+.g-lock svg{display:block;width:380px;height:380px}
+.g-lock .bezel{fill:var(--fx-steel-dark);stroke:var(--fx-steel);stroke-width:6}
+.g-lock .face{fill:var(--ink)}
+.g-lock .target{fill:var(--green)}
+.g-lock line{stroke:var(--paper);stroke-width:2}
+.g-lock line.major{stroke-width:4}
+.g-lock text{fill:var(--paper);font:700 19px var(--sans);text-anchor:middle;dominant-baseline:middle}
+.g-lock .hub{fill:var(--fx-steel)}
+.g-lock .knurl{fill:none;stroke:var(--fx-steel-dark);stroke-width:7;stroke-dasharray:4 4}
+.g-lock .index{fill:var(--paper2);stroke:var(--ink);stroke-width:2;transition:fill .08s}
+.g-lock .index.hot{fill:var(--accent)}
+/* Froissez ! : a room, a bin, a paper ball */
+.g-scene{position:absolute;inset:0}
+.g-room{position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,17,13,.8) 0%,rgba(20,17,13,.72) 70%,rgba(58,47,37,.95) 91.6%,#3a2f25 100%)}
+.g-paper{position:absolute;left:0;top:0;width:1280px;height:720px;overflow:hidden;transform-origin:50% 50%;box-shadow:0 0 0 3px rgba(0,0,0,.15)}
+.g-paper .wrinkle{position:absolute;inset:0;opacity:0;
+  background:repeating-conic-gradient(from 20deg at 40% 45%,rgba(0,0,0,.28) 0deg 7deg,rgba(255,255,255,.22) 7deg 15deg,rgba(0,0,0,.1) 15deg 26deg),
+             radial-gradient(circle at 35% 30%,rgba(255,255,255,.35),rgba(0,0,0,.35) 75%)}
+.g-bin-back{position:absolute;height:28px;border-radius:50%;background:#14110d;box-shadow:inset 0 6px 10px rgba(0,0,0,.8)}
+.g-bin{position:absolute;transform-origin:50% 100%;clip-path:polygon(0 0,100% 0,88% 100%,12% 100%);
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.08) 0 10px,rgba(0,0,0,.08) 10px 22px),linear-gradient(90deg,var(--fx-steel-dark),var(--fx-steel) 45%,var(--fx-steel-dark));
+  border-top:8px solid var(--fx-steel)}
+.g-aim{position:absolute;width:150px;height:8px;margin-top:0;border-radius:4px;background:linear-gradient(90deg,rgba(250,247,240,.2),var(--paper));transform-origin:0 50%;transition:opacity .2s}
+.g-aim::after{content:'';position:absolute;right:-14px;top:-9px;border:13px solid transparent;border-left:18px solid var(--paper);border-right:0}
+.g-meter{position:absolute;width:20px;height:170px;border-radius:10px;background:rgba(250,247,240,.15);overflow:hidden;opacity:.35;transition:opacity .2s}
+.g-meter.on{opacity:1}
+.g-meter i{position:absolute;left:0;right:0;bottom:0;height:100%;transform-origin:50% 100%;transform:scaleY(0);background:linear-gradient(0deg,var(--green),var(--gold) 60%,var(--accent))}
+.g-wind{position:absolute;left:50%;top:70px;transform:translateX(-50%);padding:6px 16px;border-radius:999px;background:rgba(20,17,13,.7);color:var(--paper);font:700 20px/1 var(--mono);letter-spacing:.1em}
+.g-dot{position:absolute;left:-5px;top:-5px;width:10px;height:10px;border-radius:50%;background:var(--paper);opacity:0}
+/* Diapo Hero */
+.g-veil{position:absolute;inset:0;background:#14110d}
+.g-stage{position:absolute;inset:0}
+.g-lane{position:absolute;top:0;bottom:0;width:140px;background:linear-gradient(180deg,rgba(250,247,240,0),rgba(250,247,240,.07));border-left:1px solid rgba(250,247,240,.15);border-right:1px solid rgba(250,247,240,.15)}
+.g-hitzone{position:absolute;width:88px;height:88px;border-radius:50%;display:flex;align-items:center;justify-content:center;font:700 34px/1 var(--mono);color:var(--paper);border:5px solid currentColor}
+.g-hitzone.l0{color:var(--rw-2)} .g-hitzone.l1{color:var(--accent)}
+.g-gem{position:absolute;left:0;top:0;width:60px;height:60px;border-radius:50%;box-shadow:0 0 18px currentColor,inset 0 -6px 0 rgba(0,0,0,.25);background:currentColor}
+.g-gem.l0{color:var(--rw-2)} .g-gem.l1{color:var(--accent)}
+.g-gem.long{outline:4px solid rgba(250,247,240,.7);outline-offset:3px}
+.g-gem.miss{color:#5a534a;box-shadow:none}
+.g-judge{position:absolute;font:800 26px/1 var(--mono);color:var(--paper);white-space:nowrap;text-shadow:0 2px 0 #000}
+.g-judge.perfect{color:var(--rw-4)} .g-judge.miss{color:#a39a8d}
+.g-combo{position:absolute;left:50%;top:120px;transform:translateX(-50%);font:900 44px/1 var(--mono);color:var(--rw-4);text-shadow:0 3px 0 #000}
+/* Tranchez ! */
+.g-piece{box-shadow:0 10px 26px rgba(0,0,0,.45);border-radius:4px}
+.g-bomb{position:absolute;left:0;top:0;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6b645c,#14110d 60%);box-shadow:0 0 0 4px var(--accent),0 8px 20px rgba(0,0,0,.5)}
+.g-bomb i{position:absolute;left:52px;top:-18px;width:8px;height:24px;border-radius:4px;background:var(--gold);transform:rotate(25deg);box-shadow:0 -6px 12px 3px rgba(255,200,80,.9)}
+.g-juice{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%}
+.g-juice.j0{background:var(--accent)} .g-juice.j1{background:var(--gold)} .g-juice.j2{background:var(--paper)}
+.g-trail{position:absolute;inset:0;pointer-events:none}
+.g-trail svg{width:100%;height:100%}
+.g-trail polyline{fill:none;stroke:var(--paper);stroke-width:9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(255,255,255,.9))}
+.g-slash{position:absolute;width:2400px;height:10px;border-radius:5px;background:linear-gradient(90deg,transparent,var(--paper) 45%,#fff 50%,var(--paper) 55%,transparent);box-shadow:0 0 20px #fff}
+/* Course */
+.g-runworld{position:absolute;inset:0;overflow:hidden;transform-origin:0 0;background:linear-gradient(180deg,#221d18 0%,#3a2f25 78%)}
+.g-far{position:absolute;inset:0;opacity:.35;background-image:radial-gradient(circle,rgba(250,247,240,.5) 0 2px,transparent 3px);background-size:64px 64px}
+.g-ground{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,var(--paper2) 0 6px,var(--ink2) 6px,var(--ink) 100%)}
+.g-track{position:absolute;left:0;top:0}
+.g-word{position:absolute;padding:8px 14px;border-radius:8px;white-space:nowrap;background:var(--paper);color:var(--ink);font:700 28px/1.1 var(--serif);box-shadow:0 6px 0 var(--ink2),0 10px 18px rgba(0,0,0,.4)}
+.g-word.fly{background:var(--gold-w);box-shadow:0 0 0 3px var(--gold),0 10px 18px rgba(0,0,0,.4)}
+/* Le pont */
+.g-cam{position:absolute;inset:0;transform-origin:0 0}
+.g-sky{position:absolute;inset:0;background:linear-gradient(180deg,#221d18 0%,#3a2f25 70%,#4d3d2d 100%)}
+.g-pillar{position:absolute;background:linear-gradient(90deg,var(--ink) 0%,var(--ink2) 50%,var(--ink) 100%);border-top:6px solid var(--paper2)}
+.g-mark{position:absolute;width:20px;height:6px;background:var(--accent)}
+.g-post{position:absolute;width:8px;background:var(--ink2)}
+.g-board{transform-origin:0 0;box-shadow:0 0 0 12px var(--paper2),0 20px 40px rgba(0,0,0,.5)}
+.g-stick{position:absolute;left:0;top:0;width:6px;height:1px;background:var(--gold);transform-origin:50% 100%}
+.g-hero{
+  position:absolute;left:0;top:0;width:44px;height:44px;border-radius:8px;transform-origin:50% 100%;
+  background:
+    radial-gradient(circle at 32% 38%,var(--ink) 0 9%,transparent 10%),radial-gradient(circle at 68% 38%,var(--ink) 0 9%,transparent 10%),
+    radial-gradient(circle at 32% 38%,var(--paper) 0 18%,transparent 19%),radial-gradient(circle at 68% 38%,var(--paper) 0 18%,transparent 19%),
+    var(--accent);
+  box-shadow:inset 0 -5px 0 var(--accent-dark),0 4px 8px rgba(0,0,0,.35);
+}
+/* ---------------- rewards (X) ----------------
+   The HUD sits top left of the screen, in the slide's top margin; everything
+   else is .rw-layer inside #deck, over the slides, the transitions and the
+   games. The rarity colours read at a glance -- grey, blue, violet, gold --
+   and the multiplier is red, as in Balatro. */
+:root{--rw-1:#a39a8d;--rw-2:#4c8ee0;--rw-3:#a45ee6;--rw-4:#f2b632;--rw-gold-lt:#ffe08a;--rw-mult:#ff7a5c;--rw-chip:#8fc1ff}
+#rw-hud{
+  position:fixed;left:10px;top:10px;z-index:55;display:flex;align-items:center;gap:10px;padding:5px 14px 5px 5px;border-radius:999px;
+  background:rgba(20,17,13,.84);color:#f3eee2;font:700 14px/1 var(--mono);pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.3);
+}
+#rw-hud[hidden]{display:none}
+#rw-hud .lv{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--rw-4);color:var(--ink);font-size:14px}
+#rw-hud .xp{width:120px;height:8px;border-radius:4px;background:rgba(255,255,255,.15);overflow:hidden}
+#rw-hud .xp i{display:block;height:100%;background:linear-gradient(90deg,var(--rw-4),var(--rw-gold-lt));transform-origin:0 50%;transition:transform .5s cubic-bezier(.3,1.3,.5,1)}
+#rw-hud .score{min-width:64px;text-align:right}
+#rw-hud .combo{color:var(--rw-mult)}
+#rw-hud .combo:empty{display:none}
+#rw-hud .cards{display:flex;align-items:center;gap:5px;color:#cfc6b4}
+#rw-hud .cards i{width:10px;height:14px;border-radius:2px;border:2px solid currentColor}
+body.presenter #rw-hud{display:none}
+.rw-layer{position:absolute;inset:0;z-index:30;pointer-events:none}
+.rw-tally{position:absolute;right:26px;top:64px;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.rw-tally .row{
+  display:flex;gap:12px;align-items:baseline;padding:5px 12px;border-radius:8px;
+  background:rgba(20,17,13,.88);color:#f3eee2;font:600 17px/1.2 var(--sans);box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.rw-tally .row b{font:800 20px/1 var(--mono);color:var(--rw-chip)}
+.rw-tally .mult{background:rgba(110,22,12,.92)}
+.rw-tally .mult b{color:var(--rw-mult)}
+.rw-tally .crit{background:linear-gradient(90deg,#7a170b,#d64531)}
+.rw-tally .crit b{color:#fff;font-size:26px}
+.rw-tally .total b{font-size:30px;color:var(--rw-4)}
+.rw-flash{position:absolute;inset:0;background:#fff}
+.rw-word{
+  position:absolute;left:50%;top:34%;white-space:nowrap;font:900 100px/1.1 var(--serif);padding:0 .1em;
+  background:linear-gradient(180deg,#fff 0%,var(--rw-gold-lt) 35%,var(--rw-4) 60%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:3px var(--ink);filter:drop-shadow(0 7px 0 var(--ink)) drop-shadow(0 0 30px rgba(242,182,50,.6));
+}
+.rw-word.breaker{background:linear-gradient(180deg,#fff 0%,#ffb3a6 40%,var(--accent) 100%);-webkit-background-clip:text;background-clip:text;font-size:88px}
+.rw-rays{
+  position:absolute;left:50%;top:50%;width:1700px;height:1700px;margin:-850px 0 0 -850px;border-radius:50%;
+  background:repeating-conic-gradient(rgba(242,182,50,.3) 0deg 9deg,transparent 9deg 18deg);
+  -webkit-mask:radial-gradient(circle,#000 10%,transparent 60%);mask:radial-gradient(circle,#000 10%,transparent 60%);
+}
+.rw-reveal{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:rgba(20,17,13,.55)}
+.rw-caption{position:relative;font:700 26px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--rw-gold-lt);text-shadow:0 2px 0 var(--ink)}
+.rw-card{position:relative;width:344px;height:252px;perspective:1300px}
+.rw-card .in{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .38s cubic-bezier(.3,1.4,.5,1)}
+.rw-card .back,.rw-card .front{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;overflow:hidden}
+.rw-card .back{
+  display:flex;align-items:center;justify-content:center;border:6px solid var(--paper2);transition:box-shadow .06s;
+  background:repeating-linear-gradient(45deg,var(--accent) 0 12px,var(--accent-dark) 12px 24px);
+}
+.rw-card .back span{font:900 110px/1 var(--serif);color:var(--paper);text-shadow:0 4px 0 var(--accent-dark)}
+.rw-card .front{
+  transform:rotateY(180deg);background:var(--paper2);border:6px solid var(--rc);padding:6px;display:flex;flex-direction:column;gap:6px;
+  box-shadow:0 0 40px 6px var(--rc);
+}
+.r-common{--rc:var(--rw-1)} .r-rare{--rc:var(--rw-2)} .r-epic{--rc:var(--rw-3)} .r-legendary{--rc:var(--rw-4)}
+.rw-view{position:relative;flex:none;width:320px;height:180px;overflow:hidden;border-radius:6px}
+.rw-view>.slide{transform:scale(.25);transform-origin:0 0}
+.rw-card .name{font:700 15px/1.25 var(--serif);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:90px}
+.rw-card .tier{position:absolute;right:12px;bottom:12px;font:800 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--rc)}
+.rw-card .foil{
+  position:absolute;inset:0;pointer-events:none;opacity:0;mix-blend-mode:overlay;background-size:250% 100%;
+  background-image:linear-gradient(115deg,transparent 20%,rgba(255,120,200,.7) 35%,rgba(120,220,255,.7) 45%,rgba(255,240,120,.7) 55%,transparent 70%);
+  animation:rw-foil 2.2s linear infinite;
+}
+.r-epic .foil,.r-legendary .foil{opacity:1}
+@keyframes rw-foil{from{background-position:120% 0}to{background-position:-120% 0}}
+.rw-burst{position:absolute;left:50%;top:50%;width:700px;height:700px;margin:-350px 0 0 -350px;border-radius:50%}
+.rw-level{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle,rgba(20,17,13,.2),rgba(20,17,13,.78))}
+.rw-level small{position:relative;font:700 30px/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;color:var(--rw-gold-lt)}
+.rw-level b{position:relative;font:900 230px/1 var(--serif);color:var(--rw-4);-webkit-text-stroke:5px var(--ink);filter:drop-shadow(0 10px 0 var(--ink))}
+.rw-fever{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;overflow:hidden;background:rgba(20,17,13,.35)}
+.rw-fever .rainbow{position:absolute;left:50%;top:50%;width:2000px;height:2000px;margin:-1000px 0 0 -1000px;opacity:.5;filter:blur(50px);
+  background:conic-gradient(#ff5f6d,#ffc371,#fff27a,#7cff4f,#00d4ff,#b36bff,#ff5f6d)}
+.rw-fever b{position:relative;font:900 96px/1 var(--serif);color:#fff;-webkit-text-stroke:4px var(--ink);filter:drop-shadow(0 8px 0 var(--ink));white-space:nowrap}
+.rw-fever .bonus{position:relative;font:800 60px/1 var(--mono);color:var(--rw-gold-lt);text-shadow:0 4px 0 var(--ink)}
+.rw-fever .stats{
+  position:relative;display:grid;grid-template-columns:auto auto;gap:8px 30px;align-items:baseline;padding:18px 30px;border-radius:14px;
+  background:rgba(20,17,13,.78);color:#f3eee2;font:600 24px/1.2 var(--sans);
+}
+.rw-fever .stats b{font:800 26px/1 var(--mono);color:var(--rw-4);-webkit-text-stroke:0;filter:none;text-align:right}
+.rw-ach{
+  position:absolute;right:26px;bottom:62px;display:flex;gap:14px;align-items:center;padding:12px 20px 12px 12px;border-radius:12px;
+  background:rgba(20,17,13,.93);color:#f3eee2;border:2px solid var(--rw-4);box-shadow:0 8px 24px rgba(0,0,0,.4),0 0 24px rgba(242,182,50,.35);
+}
+.rw-ach .cup{
+  flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,var(--rw-4) 60%,#b07d12);color:#5a3d05;font:900 28px/1 var(--serif);
+}
+.rw-ach small{display:block;margin-bottom:4px;font:700 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--rw-4)}
+.rw-ach b{display:block;font:700 19px/1.2 var(--sans)}
+.rw-ach span{font:14px/1.3 var(--sans);color:#cfc6b4}
+/* speaker notes: only ever shown in the presenter view (S) */
+aside.notes{display:none}
+/* ---------------- overview (O) and jump-to-slide (12 Enter) ---------------- */
+#sorter{position:fixed;inset:0;z-index:60;overflow-y:auto;background:rgba(20,17,13,.97);padding:26px 32px 48px}
+#sorter .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+#sorter .sec{
+  grid-column:1/-1;margin-top:10px;
+  font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e0956f;
+}
+#sorter .th{cursor:pointer;min-width:0}
+#sorter .frame{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;outline:3px solid transparent;outline-offset:3px}
+#sorter .th:hover .frame{outline-color:rgba(240,180,143,.45)}
+#sorter .th.cur .frame{outline-color:var(--accent)}
+#sorter .th.sel .frame{outline-color:#f0b48f}
+#sorter .lab{display:flex;gap:10px;margin-top:8px;font-size:12px;color:#8a8071}
+#sorter .lab span:first-child{flex:none;font-family:var(--mono);color:#cfc6b4}
+#sorter .lab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sorter .frame>.slide,#pv .stage>.slide{transform-origin:0 0;transform:scale(var(--s,.2));pointer-events:none}
+#jump{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;pointer-events:none;
+  background:rgba(20,17,13,.92);color:var(--paper);border-radius:12px;padding:10px 34px;
+  font-family:var(--serif);font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+/* ---------------- presenter view (S opens it in its own window) ---------------- */
+body.presenter{display:block}
+body.presenter>#deck,body.presenter>#ui,body.presenter>#help{display:none}
+#pv{
+  position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+  gap:22px;padding:18px 22px;color:#cfc6b4;
+}
+#pv>section{display:flex;flex-direction:column;gap:8px;min-height:0}
+#pv .bar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:#8a8071}
+#pv .bar b{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#e0956f}
+#pv .stage{position:relative;flex:none;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#000}
+#pv .now .stage{width:min(100%,calc((100vh - 70px) * 16 / 9))}
+#pv .end{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8a8071}
+#pv .clock{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+#pv .timer{font:700 40px var(--mono);color:var(--paper);background:none;border:0;padding:0;cursor:pointer}
+#pv .wall{font:400 22px var(--mono);color:#8a8071}
+#pv .notes{
+  flex:1;min-height:0;overflow-y:auto;
+  background:#211d19;border:1px solid #453d33;border-radius:8px;padding:14px 18px;
+  font-size:21px;line-height:1.5;color:#efe8da;
+}
+#pv .notes p+p{margin-top:.6em}
+#pv .notes .none{color:#8a8071;font-style:italic}
+/* ---------------- key list (?) ---------------- */
+#keys{position:fixed;inset:0;z-index:75;display:flex;align-items:center;justify-content:center;background:rgba(20,17,13,.72)}
+#keys[hidden]{display:none}
+#keys .box{
+  background:#211d19;color:#e8e1d2;border:1px solid #453d33;border-radius:12px;
+  padding:22px 28px 18px;font-family:var(--sans);font-size:15px;max-width:calc(100vw - 32px);
+}
+#keys h2{font-family:var(--serif);font-size:24px;color:var(--paper);margin-bottom:12px}
+#keys td{padding:5px 0;vertical-align:baseline}
+#keys td:first-child{font-family:var(--mono);font-size:13px;color:#f0b48f;padding-right:26px;white-space:nowrap}
+/* ---------------- authoring mode (D) ----------------
+   Screen only, and off unless toggled: a dashed guide on the content box, the
+   footer zone hatched, builds shown, spill past the slide edge left visible,
+   overflowing elements outlined in red, and the #dev problem panel. */
+@media screen{
+  body.dev #deck .slide.active{overflow:visible}
+  body.dev #deck .slide.active::after{
+    content:'';position:absolute;inset:54px 72px 46px;pointer-events:none;z-index:40;
+    outline:1px dashed rgba(43,74,111,.5);
+  }
+  body.dev #deck .slide.active::before{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:42px;pointer-events:none;z-index:40;
+    background:repeating-linear-gradient(-45deg,rgba(179,67,46,.10) 0 6px,transparent 6px 12px);
+  }
+  body.dev #deck .frag{opacity:1;outline:1px dashed var(--gold);outline-offset:2px}
+  body.dev #deck .dev-over{outline:2px solid #d62d20;outline-offset:-1px;background-color:rgba(214,45,32,.07)}
+  #dev{
+    position:fixed;left:12px;bottom:14px;z-index:65;width:min(460px,calc(100vw - 24px));max-height:42vh;overflow:auto;
+    background:rgba(20,17,13,.95);color:#e8e1d2;border:1px solid #453d33;border-radius:8px;
+    font:12px/1.5 var(--mono);padding:9px 12px;
+  }
+  #dev .hd{display:flex;justify-content:space-between;gap:12px;margin-bottom:4px;color:#e0956f;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  #dev .hd span:last-child{color:#8a8071;font-weight:400;letter-spacing:0;text-transform:none}
+  #dev .where{color:#cfc6b4;margin-bottom:6px}
+  #dev ul{list-style:none}
+  #dev li{padding:3px 0;border-top:1px solid #2c261f;cursor:pointer}
+  #dev li:hover,#dev li.here{color:#fff}
+  #dev li b{color:#f0b48f}
+  #dev .ok{color:#9fcfae}
+}
+/* ---------------- size & spacing utilities ----------------
+   Last in the sheet and scoped under .slide, so they beat the component
+   defaults. (A bare .small used to lose to ul.b, table.tbl and .note on
+   specificity -- which is why decks fell back to style="font-size:17px".)
+     .big 25 · .small 18 · .smaller 17 · .xs 16 · .xxs 15
+     .mt-s 8 · .mt 14 · .mt-l 22   margin-top; also overrides .takeline's auto
+     .nogrow                        flex:none; here so it also beats .cards / .stat (flex:1) */
+.slide .big{font-size:25px}
+.slide .small{font-size:18px}
+.slide .smaller{font-size:17px}
+.slide .xs{font-size:16px;line-height:1.42}
+.slide .xxs{font-size:15px;line-height:1.4}
+.slide .mt-s{margin-top:8px}
+.slide .mt{margin-top:14px}
+.slide .mt-l{margin-top:22px}
+.slide .nogrow{flex:none}
+/* ---------------- print ---------------- */
+@page{size:1280px 720px;margin:0}
+@media print{
+  body{display:block;background:#fff;overflow:visible}
+  #deck{transform:none !important;width:1280px;height:auto}
+  .slide{position:relative;display:flex !important;inset:auto;break-after:page;page-break-after:always}
+  #ui,#help,#jump,#sorter,#pv,#keys,#dev,#toast,.fx-layer,.game,#rw-hud,.rw-layer{display:none !important}
+  .frag{opacity:1 !important;transition:none}
+  figure.fig img{box-shadow:none}
+}
+
+/* N: the name of the transition that just played, kept until the next one */
+#fxname{position:fixed;left:14px;bottom:14px;z-index:60;font:13px var(--mono);color:#fff;
+  background:rgba(33,29,25,.85);padding:6px 10px;border-radius:6px;pointer-events:none}
+#fxname[hidden]{display:none}
+@media print{#fxname{display:none}}
