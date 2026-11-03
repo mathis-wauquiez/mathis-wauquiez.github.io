@@ -161,12 +161,9 @@ table.tbl tr.sota td{font-weight:700}
   <div class="kicker">Seminar &middot; S. Mowlavi (Centre Borelli)</div>
   <h1>Learn the fonts of a corpus, <span class="thin">without labels</span></h1>
   <div class="body">
-    <div class="note sm"><strong>Why it can work.</strong> In a printed book, every &ldquo;a&rdquo; comes
-      from a few metal sorts cast in one mould: the same shape, repeated hundreds of times. OCR trained
-      elsewhere fails on old prints, and annotating each book costs too much &mdash; so exploit the
-      repetition instead.</div>
+    <p class="small"><strong>Idea:</strong> printed letters repeat &mdash; use that instead of annotating.</p>
     <div class="diagram mt">
-      <svg viewBox="0 0 1136 262" style="width:100%;max-height:262px" font-size="18"
+      <svg viewBox="0 0 1136 262" style="width:100%;max-height:200px" font-size="18"
            role="img" aria-label="Four steps: cut the page into characters and read them with an OCR; group the crops by the letter read; split a group when it holds two shapes; relabel the minority shape, which corrects OCR errors">
         <defs><marker id="mw-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
         <g text-anchor="middle">
@@ -203,57 +200,30 @@ table.tbl tr.sota td{font-weight:700}
         <path class="edge" d="M842,112 L880,112" marker-end="url(#mw-ah)"/>
       </svg>
     </div>
-    <div class="takeline sm">The result is the book&rsquo;s own font: one prototype per letter shape &mdash; the font stage of reverse typography.</div>
-  </div>
-  <aside class="notes">
-    <p>[1:25 &middot; 35 s] Seginus Mowlavi&rsquo;s idea: in a printed book, every letter comes from metal type cast in one
-      mould, so the same shape recurs hundreds of times. Instead of annotating, exploit that. Cut the
-      page into characters and let an existing OCR read them, errors included. Group the crops by the
-      letter read. Inside each group, compare shapes: if a statistical test says there are two, split,
-      and repeat. A sub-group of &ldquo;c&rdquo;s hiding among the &ldquo;o&rdquo;s is an OCR error:
-      relabel it.</p>
-  </aside>
-</section>
-
-<section class="slide">
-  <div class="kicker">Seminar &middot; S. Mowlavi (Centre Borelli)</div>
-  <h1>What the clusters give: <span class="thin">a book&rsquo;s own font</span></h1>
-  <div class="body">
-    <div class="cols narrow">
-      <div class="col">
-        <figure class="fig">
-          <img src="sem_slides/figures/mowlavi_split.png" alt="three histograms and a split tree from o to o and c" style="max-height:200px">
-          <figcaption>Two humps in a group&rsquo;s statistics (pink): two shapes, split. One hump: keep.
-            &ldquo;o&rdquo; splits into &ldquo;o&rdquo; and &ldquo;c&rdquo;, then into variants.
-            <span class="src">His slides; my reading of them.</span></figcaption>
-        </figure>
-      </div>
-      <div class="col">
-        <figure class="fig">
-          <img src="sem_slides/figures/mowlavi_editions.png" alt="two editions of a comedia and their letter prototypes" style="max-height:200px">
-          <figcaption>Two editions of one <i>comedia</i>, their letters side by side: the two fonts can
-            be compared. <span class="src">His slides.</span></figcaption>
-        </figure>
+    <div class="cols narrow mt-s">
+      <div class="col auto">
+        <figure class="fig"><img src="sem_slides/figures/mowlavi_split.png" alt="histograms and a split tree from o to o and c" style="max-height:175px">
+          <figcaption>One hump: keep. Two humps: split. <span class="src">His slides.</span></figcaption></figure>
       </div>
       <div class="col mid">
-        <ul class="b xs">
-          <li><strong>OCR correction</strong> with no annotation: each group must agree.</li>
-          <li><strong>A model of the font</strong>: one prototype per letter shape.</li>
-          <li><strong>Philology</strong>: compare editions, letter by letter (the bridge to Belzarena).</li>
-          <li><strong>Forensics</strong>: a character that fits no group of its page is suspect.</li>
+        <ul class="b small">
+          <li><strong>Why</strong>: each letter comes from a few metal sorts cast in one mould &mdash; one
+            shape per group.</li>
+          <li><strong>Result</strong>: the book&rsquo;s own font, one prototype per letter &mdash; the font
+            stage of reverse typography.</li>
         </ul>
       </div>
     </div>
     <div class="verdict">
-      <span class="vk pro">Strength</span><span>The redundancy of print is the only supervision, and a group can be looked at: an error is visible.</span>
-      <span class="vk que">Open question</span><span>When is a split a genuinely new type (another font, a broken sort) and not noise? How is a letter seen five times corrected?</span>
+      <span class="vk pro">Strength</span><span>The redundancy of print is the only supervision, and a cluster can be looked at.</span>
+      <span class="vk que">Open question</span><span>When is a split a new piece of type, not noise? What about rare letters?</span>
     </div>
   </div>
   <aside class="notes">
-    <p>[2:00 &middot; 30 s] What comes out is the font of the book, one prototype per letter shape: the font stage of
-      reverse typography. It corrects the OCR without a single label. It lets you compare the fonts of
-      two editions, which is the bridge to Diego&rsquo;s work. And a character that fits no group is
-      suspicious. Question: when is a split a new type, a broken sort, rather than noise?</p>
+    <p>[1:25 &middot; 30 s] Seginus Mowlavi: in a printed book the same letter shapes recur hundreds of times. Let an OCR
+      read every character, group them by the letter read, split a group when it holds two shapes, and
+      relabel the misread ones. What comes out is the book&rsquo;s own font: the font stage of reverse
+      typography. Question: when is a split a new piece of type rather than noise?</p>
   </aside>
 </section>
 
@@ -296,7 +266,7 @@ table.tbl tr.sota td{font-weight:700}
       metal type that printed it &mdash; and from the type to the print shop.</div>
   </div>
   <aside class="notes">
-    <p>[2:30 &middot; 40 s] Diego Belzarena&rsquo;s problem: in 17th-century Spain, more than half of all books name no
+    <p>[1:55 &middot; 40 s] Diego Belzarena&rsquo;s problem: in 17th-century Spain, more than half of all books name no
       printer, often on purpose. Among them, the comedias sueltas: cheap, short pamphlets of plays.
       Philologists identify them by hand, comparing typefaces and ornaments with books of known origin;
       for a hundred books that is some five thousand comparisons. And same typeface does not mean same
@@ -309,40 +279,35 @@ table.tbl tr.sota td{font-weight:700}
   <div class="kicker">GTTI seminar &middot; D. Belzarena &middot; the method</div>
   <h1>Recover each book&rsquo;s type, <span class="thin">then count what differs</span></h1>
   <div class="body">
-    <div class="rtline"><b>Reverse typography in practice.</b> Each book&rsquo;s letters are traced back to
-      the type that printed them: one prototype per piece of type. Books are then compared type by type,
-      not text by text.</div>
+    <div class="rtline"><b>Reverse typography in practice:</b> trace each book&rsquo;s letters back to the
+      type that printed them, then compare books type by type.</div>
     <div class="cols narrow">
-      <div class="col" style="flex:1.05">
-        <div class="steps xs">
-          <div class="step"><b>1</b> <strong>Find the characters</strong> (a CharNet detector) and sort
-            roman from italic by the slant of each word.</div>
-          <div class="step"><b>2</b> <strong>One prototype per type, per book</strong>: cluster the
-            book&rsquo;s characters and average each cluster &mdash; the clustering of Mowlavi&rsquo;s talk.</div>
-          <div class="step"><b>3</b> <strong>Compare two books letter by letter</strong>: align the two
-            prototypes of each letter, take their distance (the closest pair, since a book may own several
-            variants of a letter).</div>
-          <div class="step"><b>4</b> <strong>Count, a contrario, the letters that surely differ</strong>:
-            if the books shared their type, chance alone would make few distances large (a binomial law).
-            The smallest count compatible with it, at 0.01 false alarms over all pairs, is
-            <span class="m">n&#770;<sub>1</sub></span>; the share of differing letters links the books.</div>
+      <div class="col mid" style="flex:0.8">
+        <div class="steps small">
+          <div class="step"><b>1</b> <strong>Find the characters</strong>, roman and italic apart.</div>
+          <div class="step"><b>2</b> <strong>One prototype per type, per book</strong>: cluster and
+            average (Mowlavi&rsquo;s method).</div>
+          <div class="step"><b>3</b> <strong>Compare two books letter by letter</strong>: distance between
+            aligned prototypes.</div>
+          <div class="step"><b>4</b> <strong>Count the letters that surely differ</strong>: more than chance
+            allows if the type were shared (a contrario, 0.01 false alarms).</div>
         </div>
       </div>
       <div class="col">
         <figure class="fig">
-          <img src="sem_slides/figures/belzarena_approach.png" alt="(a) two books, (b) their characters, (c) clustered per book, (d) prototypes matched letter by letter" style="max-height:118px">
-          <figcaption>(a) books, (b) characters, (c) clusters per book, (d) prototypes matched by letter.</figcaption>
+          <img src="sem_slides/figures/belzarena_approach.png" alt="(a) two books, (b) their characters, (c) clustered per book, (d) prototypes matched letter by letter" style="max-height:165px">
+          <figcaption>(a) books &rarr; (b) characters &rarr; (c) clusters &rarr; (d) prototypes matched.</figcaption>
         </figure>
         <figure class="fig mt-s">
-          <img src="sem_slides/figures/belzarena_italics.png" alt="italic prototypes a d e i l n o r for 21 books" style="max-height:150px">
-          <figcaption>Italic prototypes, one column per book: books 0&ndash;7 share one italic (thin
-            &ldquo;o&rdquo;), 8&ndash;20 another. <span class="src">Belzarena, Mowlavi et al., 2026, fig.&nbsp;6.</span></figcaption>
+          <img src="sem_slides/figures/belzarena_italics.png" alt="italic prototypes a d e i l n o r for 21 books" style="max-height:185px">
+          <figcaption>Italic prototypes per book: a thin &ldquo;o&rdquo; in books 0&ndash;7, a bold one in
+            8&ndash;20. <span class="src">Belzarena, Mowlavi et al., 2026.</span></figcaption>
         </figure>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>[3:10 &middot; 35 s] The method is reverse typography in practice. Find every character; per book, cluster them and
+    <p>[2:35 &middot; 35 s] The method is reverse typography in practice. Find every character; per book, cluster them and
       average each cluster: one prototype per piece of type, the clustering we just saw with Seginus.
       Then compare two books letter by letter, and count, a contrario, how many letters surely differ
       &mdash; more than chance would allow if the books shared their type. Here, italic prototypes for
@@ -381,7 +346,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[3:45 &middot; 35 s] It works: on the books whose printer is known, it separates same from different printers almost
+    <p>[3:10 &middot; 35 s] It works: on the books whose printer is known, it separates same from different printers almost
       perfectly. And it found new things, each then checked by experts the classical way: book 51 joins
       Fajardo&rsquo;s family, two books form a new family, and two books filed under Lyra belong to
       Rodr&iacute;guez de &Aacute;brego. Strength: about fifteen minutes per book, with guarantees.
@@ -430,7 +395,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[4:20 &middot; 30 s] Ruben Leon&rsquo;s PhD assessment. For one image, segmentation has a theory: the
+    <p>[3:45 &middot; 30 s] Ruben Leon&rsquo;s PhD assessment. For one image, segmentation has a theory: the
       Mumford&ndash;Shah energy, uniform regions and short boundaries, whose minimisers can be studied.
       Global models like SAM have none. Three gaps: no energy of the segmentation, so no theory; masks
       that overlap instead of forming a partition or a tree; and no definition of an object. For the
@@ -468,7 +433,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[4:50 &middot; 20 s] The conceptual gap, made concrete: fourteen textures with exact boundaries, and SAM misses four,
+    <p>[4:15 &middot; 20 s] The conceptual gap, made concrete: fourteen textures with exact boundaries, and SAM misses four,
       for reasons its data cannot tell. So he builds a generator of abstract images, dead leaves: random
       shapes, colours and textures, each a variable he controls, with exact ground truth.</p>
   </aside>
@@ -498,7 +463,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[5:10 &middot; 25 s] Then Abstract SAM: SAM retrained from scratch on these images, without prompts, segmenting the
+    <p>[4:35 &middot; 25 s] Then Abstract SAM: SAM retrained from scratch on these images, without prompts, segmenting the
       whole image at once, with Mumford&ndash;Shah terms in the loss. For reverse typography, this is the
       shape stage. Strength: theory back in segmentation. Question: do his energies have minimisers, and
       will it transfer to real images? No results yet.</p>
@@ -535,7 +500,7 @@ table.tbl tr.sota td{font-weight:700}
     <div class="takeline sm">Reverse typography: when labels are scarce, invert how the page was printed.</div>
   </div>
   <aside class="notes">
-    <p>[5:35 &middot; 40 s] Three strengths recur. First, reverse typography: each talk inverts one stage of printing,
+    <p>[5:00 &middot; 40 s] Three strengths recur. First, reverse typography: each talk inverts one stage of printing,
       the font, the type and shop, the shape, so results can be checked. Second, no annotation: the
       book&rsquo;s own redundancy, or synthetic data we fully specify. Third, they explain rather than
       only score. Open questions: validation on very few known cases; transfer to larger corpora and real
@@ -549,8 +514,6 @@ table.tbl tr.sota td{font-weight:700}
   <div class="titlebox">
     <div class="over">Thank you</div>
     <h1>Questions?</h1>
-    <div class="sub" style="margin-bottom:0">Reverse typography: from the printed page back to the type,<br>
-      the press and the print shop.</div>
   </div>
 </section>
 
