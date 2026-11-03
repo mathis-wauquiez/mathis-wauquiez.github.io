@@ -76,10 +76,10 @@ table.tbl tr.sota td{font-weight:700}
         <div class="who"><b>D. Belzarena</b>.<br>
           <i>Comedias sueltas</i>: Spanish Golden-Age plays printed as cheap pamphlets.
           Who printed them?</div></div>
-      <div class="card sm fc-green"><span class="tag">defense &middot; 6 Oct 2026</span>
+      <div class="card sm fc-green"><span class="tag">defense &middot; 29 Sep 2026</span>
         <h3>Mathematical formalization of image segmentation</h3>
         <div class="who"><b>R. W. Leon</b> (PhD, supervised by J.-M. Morel and Z. Liu).<br>
-          Train on data we fully specify, so we can explain what the model learns.</div></div>
+          Towards a global abstract segmentation model: energies for SAM-like models, trained on images without semantics.</div></div>
     </div>
     <div class="note sm mt-l"><strong>Collaborators:</strong> Seginus Mowlavi and
       Marina Gardella (Centre Borelli), and Diego Belzarena. For each
@@ -390,78 +390,118 @@ table.tbl tr.sota td{font-weight:700}
 </section>
 
 <!-- ============ III · LEON ============ -->
+<!-- Source: R. W. Leon, "Mathematical Formalization of Image Segmentation — Towards a global abstract
+     segmentation model", PhD Progress Assessment No. 1, Lingnan University, 29 Sep 2026
+     (~/Downloads/index_standalone.html). -->
 <section class="slide" id="leon" data-section="III &middot; Leon">
-  <div class="kicker">Defense &middot; R. W. Leon &middot; 6 Oct 2026</div>
-  <h1>A great model <span class="thin">we cannot explain</span></h1>
+  <div class="kicker">Defense &middot; R. W. Leon &middot; 29 Sep 2026</div>
+  <h1>Segmentation has a theory, <span class="thin">SAM does not</span></h1>
   <div class="body">
-    <div class="cols">
-      <div class="col" style="flex:1.1">
+    <div class="cols narrow">
+      <div class="col" style="flex:0.95">
+        <h5>One image: segmentation as an energy</h5>
+        <div class="eq">$$E(\mathrm{Seg}) = \sum_{R \in \mathrm{Seg}} \Big( \mathrm{var}(g, R) + \mu\, \mathrm{length}(\partial R) \Big)$$</div>
+        <p class="xs mt-s">Mumford&ndash;Shah with a constant per region: each region should be uniform,
+          its boundary short. A segmentation is the <strong>minimiser of an explicit functional</strong>,
+          so one can ask whether it exists and how regular its edges are (the 1989 Mumford&ndash;Shah
+          conjecture; a proof was claimed in a Sept. 2026 preprint, not yet reviewed).</p>
+        <p class="xs">Raising &mu; only merges regions: the solutions form a <strong>tree</strong> of
+          segmentations.</p>
+      </div>
+      <div class="col">
+        <h5>Global models such as SAM: three gaps</h5>
+        <div class="steps xs">
+          <div class="step"><b>1</b> <strong>Formalization.</strong> A network minimises a loss over its
+            weights, not an energy of the segmentation: existence and regularity cannot even be asked.
+            <em>Proposal</em>: an energy on learned features &mdash; small variance inside each region, far
+            apart between neighbours &mdash; in Mumford&ndash;Shah&rsquo;s framework.</div>
+          <div class="step"><b>2</b> <strong>Structure.</strong> SAM&rsquo;s masks overlap and leave holes:
+            neither a partition nor a tree. <em>Proposal</em>: an overlap energy, zero exactly when masks
+            are nested or disjoint, minimised by merging regions.
+            <span style="display:flex;gap:10px;margin-top:6px">
+              <img src="sem_slides/figures/leon_masks_overlap.svg" alt="overlapping masks" style="height:58px">
+              <img src="sem_slides/figures/leon_masks_tree.svg" alt="nested or disjoint masks" style="height:58px">
+              <img src="sem_slides/figures/leon_masks_cover.svg" alt="masks covering the domain" style="height:58px">
+            </span></div>
+          <div class="step"><b>3</b> <strong>Concept.</strong> &ldquo;Object&rdquo; is never defined; it
+            lives in the annotations. Does SAM learn objects, or colour, texture and geometry?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[4:20 &middot; 30 s] Ruben Leon&rsquo;s PhD assessment. For one image, segmentation has a theory: the
+      Mumford&ndash;Shah energy, uniform regions and short boundaries, whose minimisers can be studied.
+      Global models like SAM have none. Three gaps: no energy of the segmentation, so no theory; masks
+      that overlap instead of forming a partition or a tree; and no definition of an object. For the
+      first two he proposes new energies.</p>
+  </aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Defense &middot; R. W. Leon &middot; 29 Sep 2026</div>
+  <h1>The conceptual gap: <span class="thin">test where truth is exact</span></h1>
+  <div class="body">
+    <div class="cols narrow">
+      <div class="col" style="flex:0.9">
         <figure class="fig">
-          <img src="sem_slides/figures/leon_brodatz.png" alt="a patchwork of 14 Brodatz textures and SAM's masks, missed textures in grey" style="max-height:300px">
-          <figcaption>14 Brodatz textures, exact boundaries; SAM&rsquo;s masks, grey = missed:
-            4 of 14 textures get none. <span class="src">R. W. Leon&rsquo;s slides.</span></figcaption>
+          <img src="sem_slides/figures/leon_brodatz.png" alt="a patchwork of 14 Brodatz textures and SAM's masks, missed textures in grey" style="max-height:230px">
+          <figcaption>14 textures, exact boundaries, no semantics. SAM, prompted on a grid, gives
+            <strong>4 of 14</strong> no mask &mdash; and nothing in its data says why.
+            <span class="src">His slides.</span></figcaption>
         </figure>
       </div>
-      <div class="col mid">
-        <ul class="b xs">
-          <li><strong>SAM</strong>: 11M images, 1.1B masks &mdash; but natural photos come with no
-            specification, so its failures can be neither explained nor fixed through the data.</li>
-          <li><strong>Before deep learning</strong>, a segmentation minimised an explicit energy
-            (Mumford&ndash;Shah), whose existence and regularity can be proved:
-            \(E(\mathrm{Seg}) = \sum_{R} \mathrm{var}(g,R) + \mu\,\mathrm{length}(\partial R)\).</li>
-          <li><strong>Question</strong>: do segmentation networks learn <em>objects</em>, or low-level
-            features &mdash; colour, texture, geometry?</li>
+      <div class="col">
+        <figure class="fig">
+          <img src="sem_slides/figures/leon_generator_strip.png" alt="generated images: random colours, colours picked from a photo, Brodatz textures, ALOT textures" style="max-height:130px">
+          <figcaption>His generator: random colours &middot; colours picked from a real photo &middot;
+            Brodatz textures &middot; ALOT textures. <span class="src">His slides.</span></figcaption>
+        </figure>
+        <ul class="b xs mt-s">
+          <li><strong>Dead leaves</strong>: random shapes stacked on top of one another, sizes following a
+            power law (VibrantLeaves, re-implemented as a modular GPU package).</li>
+          <li><strong>Every factor is a switch</strong>: shapes (hulls, ellipses, polygons), colours,
+            textures, a depth of field with one blur per shape.</li>
+          <li><strong>Exact ground truth, unlimited data</strong>: any error can be traced to a variable.</li>
         </ul>
       </div>
     </div>
   </div>
   <aside class="notes">
-    <p>[4:20 &middot; 30 s] Ruben Leon&rsquo;s PhD defense asks how to study a model whose data cannot be described. SAM,
-      trained on a billion masks, misses four of fourteen textures in a simple patchwork, and nothing in
-      its data says why. Before deep learning, a segmentation minimised an explicit energy,
-      Mumford&ndash;Shah, whose properties can be proved. His question: do networks learn objects, or
-      low-level features?</p>
+    <p>[4:50 &middot; 20 s] The conceptual gap, made concrete: fourteen textures with exact boundaries, and SAM misses four,
+      for reasons its data cannot tell. So he builds a generator of abstract images, dead leaves: random
+      shapes, colours and textures, each a variable he controls, with exact ground truth.</p>
   </aside>
 </section>
 
 <section class="slide">
-  <div class="kicker">Defense &middot; R. W. Leon &middot; 6 Oct 2026</div>
-  <h1>Specify the data, <span class="thin">explain the model</span></h1>
+  <div class="kicker">Defense &middot; R. W. Leon &middot; 29 Sep 2026</div>
+  <h1>Abstract SAM: <span class="thin">SAM retrained without semantics</span></h1>
   <div class="body">
     <div class="rtline"><b>For reverse typography,</b> the shape stage: segmentation defined by an
       explicit energy, learned where the truth is exact &mdash; a glyph generator would run the same
       experiment on print.</div>
-    <div class="cols narrow">
-      <div class="col" style="flex:0.9">
-        <figure class="fig">
-          <img src="sem_slides/figures/leon_generator.png" alt="a generated dead-leaves image and its exact ground truth" style="max-height:200px">
-          <figcaption>Each image is a seed plus recorded variables: scene, shape, colour, texture,
-            acquisition. <span class="src">R. W. Leon&rsquo;s slides.</span></figcaption>
-        </figure>
-      </div>
-      <div class="col mid">
-        <table class="tbl lft xs">
-          <thead><tr><th>step</th><th>what</th><th>status</th></tr></thead>
-          <tbody>
-            <tr><td>generator</td><td>dead leaves (from VibrantLeaves), real Brodatz / ALOT textures, difficulty presets</td><td>done</td></tr>
-            <tr><td>Abstract SAM</td><td>encoder from scratch, prompt-free decoder, boundary + Mumford&ndash;Shah-like loss</td><td>running</td></tr>
-            <tr><td>benchmark</td><td>levels L1&ndash;L5, up to natural images; SAM in automatic mode</td><td>planned</td></tr>
-            <tr><td>explain</td><td>one variable at a time, ablations, the same tests on SAM</td><td>planned</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <table class="tbl lft xs">
+      <thead><tr><th></th><th>SAM</th><th>Abstract SAM</th><th>why</th></tr></thead>
+      <tbody>
+        <tr><td>image encoder</td><td>pretrained on natural images</td><td>trained from scratch on abstract images</td><td>remove the natural-image prior</td></tr>
+        <tr><td>prompt</td><td>points, boxes</td><td>none (stage 1: the true mask)</td><td>the signal covers the whole shape</td></tr>
+        <tr><td>decoder</td><td>one object per prompt</td><td>the whole image in one pass</td><td>no objects to enumerate</td></tr>
+        <tr><td>loss</td><td>focal + Dice on masks</td><td>border map + boundary length (+ smoothing)</td><td>Mumford&ndash;Shah&rsquo;s terms enter training</td></tr>
+      </tbody>
+    </table>
+    <p class="xs mt-s"><strong>Status:</strong> generator done; stage 1 (encoder from scratch) running,
+      no satisfactory results yet; stage 2 (prompt-free decoder) to do.</p>
     <div class="verdict">
-      <span class="vk pro">Strength</span><span>An observational study turned into a controlled experiment: every error traces to a variable, and he names the bias of his own evaluation (SAM given oracle prompts).</span>
-      <span class="vk que">Open question</span><span>External validity (level L5): will a model trained on leaves segment real images? No results yet to judge.</span>
+      <span class="vk pro">Strength</span><span>Puts global segmentation back into a variational framework where existence and regularity can be asked, and tests SAM where every error is traceable.</span>
+      <span class="vk que">Open question</span><span>Do the proposed energies have minimisers? Will a model trained on abstract leaves segment real images? No results yet to judge.</span>
     </div>
   </div>
   <aside class="notes">
-    <p>[4:50 &middot; 35 s] His answer: specify the data. A generator of dead-leaves images where each image is a seed and
-      a list of variables, so any error traces to a variable. He trains an Abstract SAM from scratch,
-      without prompts, with Mumford&ndash;Shah-like terms in the loss, and plans a graded benchmark up to
-      natural images. For reverse typography, this is the shape stage. Strength: a controlled
-      experiment. Question, his own: external validity; there are no results yet.</p>
+    <p>[5:10 &middot; 25 s] Then Abstract SAM: SAM retrained from scratch on these images, without prompts, segmenting the
+      whole image at once, with Mumford&ndash;Shah terms in the loss. For reverse typography, this is the
+      shape stage. Strength: theory back in segmentation. Question: do his energies have minimisers, and
+      will it transfer to real images? No results yet.</p>
   </aside>
 </section>
 
@@ -495,7 +535,7 @@ table.tbl tr.sota td{font-weight:700}
     <div class="takeline sm">Reverse typography: when labels are scarce, invert how the page was printed.</div>
   </div>
   <aside class="notes">
-    <p>[5:25 &middot; 40 s] Three strengths recur. First, reverse typography: each talk inverts one stage of printing,
+    <p>[5:35 &middot; 40 s] Three strengths recur. First, reverse typography: each talk inverts one stage of printing,
       the font, the type and shop, the shape, so results can be checked. Second, no annotation: the
       book&rsquo;s own redundancy, or synthetic data we fully specify. Third, they explain rather than
       only score. Open questions: validation on very few known cases; transfer to larger corpora and real

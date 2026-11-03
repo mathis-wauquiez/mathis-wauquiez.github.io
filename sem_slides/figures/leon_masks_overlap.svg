@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 110" width="160" height="110" role="img"
+  aria-label="Overlapping masks">
+  <!-- Colours copied from env/css/tokens.css (light theme); page CSS does not reach an <img> -->
+  <style>
+    text { font-family: "Source Sans Pro", "Source Sans 3", Helvetica, Arial, sans-serif; fill: #1b2130; }
+    .frame { fill: none; stroke: #4a5366; stroke-width: 1.5; }
+  </style>
+  <rect x="5" y="5" width="150" height="100" rx="3" class="frame" />
+  <ellipse cx="60" cy="50" rx="38" ry="30" style="fill: #1f77b4; fill-opacity: 0.35" />
+  <ellipse cx="95" cy="62" rx="36" ry="28" style="fill: #e8702a; fill-opacity: 0.35" />
+  <circle cx="120" cy="30" r="16" style="fill: #2ca02c; fill-opacity: 0.35" />
+</svg>
