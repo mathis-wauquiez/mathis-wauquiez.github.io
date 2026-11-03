@@ -1,0 +1,1047 @@
+/* ==========================================================================
+   deck.css -- the design system of the 1280x720 HTML decks in documents/.
+
+   Every deck folder carries its own copy (assets/deck.css), so a finished talk
+   never reflows when this file moves on. To upgrade an old deck, copy the new
+   file over and run tools/check_overflow.py on it. Rules for one deck only go
+   in that deck's <style> in <head>, not here.
+
+   Contents, in sheet order
+     tokens ............. :root colours, washes, font stacks, dark-slide tokens
+     themes ............. :root[data-theme="board"] (executive: white, navy, Inter)
+     slide scaffold ..... .slide .kicker h1-h6 .body .cols .col(.mid .auto)
+     footer ............. .foot .fsec .fnum (stamped by deck.js)
+     text ............... ul.b .acc .blue .green .gold .dim .cjk p, links a.url,
+                          .note .takeline (.sm), blockquote (.pull), maths .m .mr .eq
+     figures ............ figure.fig (.bare) .src, .fig-wrap .callout, .ba before/after, ol.refs
+     tables ............. table.tbl .dense .xsm .bars td.v td.na td.meth, .mk
+     numbers ............ .stats(.stack) .stat .finds .find, .hero
+     cards & tags ....... .cards .card(.sm) .tag .tagrow .fc-accent/blue/green/gold/ink
+     dark slides ........ .slide.dark .vstrip .titlebox, ol.agenda (.pg .nonum)
+     steps, code, svg ... .steps .step pre.code .diagram svg .box .edge .head, .timeline
+     runtime ............ #ui #bar #help, builds .frag, aside.notes, overview
+                          #sorter, #jump, speaker view #pv, key list #keys,
+                          authoring mode body.dev #dev
+     executive layer .... .tracker .sticker h1.action .lead .source .sowhat,
+                          .scr .answer, .kpis .kpi .delta, ol.hbars, .waterfall,
+                          .stack100, .hb .rag .lvl td.rec, ol.agenda[data-auto],
+                          .matrix .q .pt, .options .option dl.kv, ol.chevrons,
+                          .gantt .lane .track .ms .today, ol.asks; #black,
+                          #sorter.story, #pv .pace
+     utilities .......... .big .small .smaller .xs .xxs .mt-s .mt .mt-l .nogrow
+     print
+   ========================================================================== */
+:root{
+  --paper:#faf7f0;
+  --paper2:#f3eee2;
+  --ink:#211d19;
+  --ink2:#4d463d;
+  --muted:#8a8071;
+  --accent:#b3432e;        /* vermillion / seal red */
+  --accent-dark:#8c3323;
+  --blue:#2b4a6f;
+  --green:#3d7a5a;
+  --gold:#b78a2e;
+  --line:#d9d0bd;
+  /* light washes of the four hues: bar fills and tints, never text */
+  --accent-w:#f2dcd5;
+  --blue-w:#d6e0ea;
+  --green-w:#d8e8df;
+  --gold-w:#efe3c4;
+  --ink-w:#e2ddd2;
+  --serif:'Source Serif 4','Source Serif Pro','Noto Serif',Georgia,'Times New Roman',serif;   /* Source Serif 4 is NOT installed here -> Noto Serif is what you actually get */
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans','Helvetica Neue',Arial,sans-serif;
+  --cjk:'Noto Sans CJK SC','Noto Sans CJK TC','Noto Sans SC',sans-serif;
+  --mono:ui-monospace,'JetBrains Mono','Fira Code','DejaVu Sans Mono',Menlo,monospace;
+  /* dark slides, surfaces and the stage around the deck: tokens, so a theme swaps them */
+  --stage:#14110d;                /* page behind the scaled deck */
+  --surface:#fff;                 /* card, stat, table, figure matte */
+  --shadow:33,29,25;              /* rgb triple for rgba(var(--shadow),.06) */
+  --dark-bg:linear-gradient(135deg,#211d19 0%,#2c2015 100%);
+  --on-dark:#faf7f0;              /* headings on a dark slide */
+  --on-dark2:#cfc6b4;             /* its body text and subtitles */
+  --on-dark3:#8a8071;             /* its muted text: affiliation, footer */
+  --dark-line:#453d33;
+  --accent-on-dark:#e0956f;       /* kicker, .over, links on a dark slide */
+}
+/* ---------------- theme: board ----------------
+   <html lang="en" data-theme="board"> -- white paper, navy ink, Inter for text,
+   the same seal-red accent. For executive audiences and printed pre-reads.
+   ?theme=board in the URL previews it without editing the file. Every text
+   colour here is WCAG-checked against its ground (muted 4.8:1, gold 4.9:1). */
+:root[data-theme="board"]{
+  --paper:#ffffff;
+  --paper2:#f2f4f7;
+  --ink:#0f1c2e;
+  --ink2:#3a4658;
+  --muted:#687385;
+  --accent:#b3432e;
+  --accent-dark:#8c3323;
+  --blue:#1f4e79;
+  --green:#2e7555;
+  --gold:#946a17;
+  --line:#d6dce4;
+  --accent-w:#f4dcd5;
+  --blue-w:#dbe5ef;
+  --green-w:#d8eadf;
+  --gold-w:#f0e4c8;
+  --ink-w:#e4e8ee;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --stage:#0a121e;
+  --shadow:15,28,46;
+  --dark-bg:linear-gradient(135deg,#0f1c2e 0%,#18304d 100%);
+  --on-dark:#ffffff;
+  --on-dark2:#c9d2de;
+  --on-dark3:#8e9bb0;
+  --dark-line:#2d4058;
+  --accent-on-dark:#ef9f86;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--stage);
+  font-family:var(--sans);
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+#deck{
+  width:1280px;height:720px;
+  position:relative;
+  transform-origin:center center;
+}
+/* ---------------- slide scaffold ---------------- */
+.slide{
+  position:absolute;inset:0;
+  width:1280px;height:720px;
+  background:var(--paper);
+  display:none;
+  flex-direction:column;
+  padding:54px 72px 46px 72px;
+  overflow:hidden;
+}
+.slide.active{display:flex}
+.kicker{
+  font-family:var(--sans);
+  font-size:15px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent);font-weight:700;
+  margin-bottom:10px;
+}
+/* ---------------- heading scale ----------------
+   h1-h3 are display type (serif), h4-h6 are labels (sans) -- the same split the
+   deck already makes between display and UI text. Sizes are absolute px on
+   purpose: the slide is a fixed 1280x720 box, so a relative em scale would only
+   make the numbers harder to reason about.
+     h1 44  slide title            (58 on .titlebox, set below)
+     h2 30  a second block on a slide that has two
+     h3 23  panel / card heading
+     h4 19  label over a table or figure group
+     h5 16  small label
+     h6 13  uppercase micro-label -- distinct from .kicker, which is accent
+            coloured and belongs above the h1, not inside the body
+   Every level takes .thin for a de-emphasised second half. */
+.slide h1{
+  font-family:var(--serif);
+  font-size:44px;line-height:1.12;font-weight:700;
+  color:var(--ink);
+  margin-bottom:26px;
+}
+.slide h2{
+  font-family:var(--serif);
+  font-size:30px;line-height:1.18;font-weight:700;
+  color:var(--ink);margin-bottom:14px;
+}
+.slide h3{
+  font-family:var(--serif);
+  font-size:23px;line-height:1.25;font-weight:700;
+  color:var(--ink);margin-bottom:10px;
+}
+.slide h4{
+  font-family:var(--sans);
+  font-size:19px;line-height:1.3;font-weight:700;
+  color:var(--ink);margin-bottom:8px;
+}
+.slide h5{
+  font-family:var(--sans);
+  font-size:16px;line-height:1.3;font-weight:700;
+  color:var(--ink2);margin-bottom:6px;
+}
+.slide h6{
+  font-family:var(--sans);
+  font-size:13px;line-height:1.3;font-weight:700;
+  color:var(--muted);text-transform:uppercase;letter-spacing:.16em;
+  margin-bottom:6px;
+}
+.slide :is(h1,h2,h3,h4,h5,h6) .thin{font-weight:400;color:var(--ink2)}
+/* Containers that space their own children (flex gap or padding) must not also
+   collect the heading's bottom margin. */
+.card>:is(h1,h2,h3,h4,h5,h6),
+.note>:is(h1,h2,h3,h4,h5,h6),
+.stat>:is(h1,h2,h3,h4,h5,h6),
+figure.fig>:is(h1,h2,h3,h4,h5,h6){margin-bottom:0}
+.body{flex:1;min-height:0;display:flex;flex-direction:column}
+.cols{display:flex;gap:44px;flex:1;min-height:0;align-items:stretch}
+.cols.narrow{gap:26px}
+/* A .col takes an equal share; weight one with style="flex:1.3". .mid centres
+   its content vertically -- the most common column in every deck so far. */
+.col{flex:1;min-width:0;display:flex;flex-direction:column}
+.col.mid{justify-content:center}
+.col.auto{flex:0 1 auto}   /* sized by its content, shrinks if it must (the old .col default) */
+.grow{flex:1}
+/* footer stamped by JS */
+.foot{
+  position:absolute;left:72px;right:72px;bottom:18px;
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;color:var(--muted);
+  border-top:1px solid var(--line);padding-top:8px;
+}
+.foot .fnum{font-variant-numeric:tabular-nums}
+/* the current section, from data-section on this slide or an earlier one */
+.foot .fsec{margin-right:14px;padding-right:14px;border-right:1px solid var(--line)}
+.slide.dark .foot .fsec{border-right-color:var(--dark-line)}
+/* ---------------- typography helpers ---------------- */
+ul.b{list-style:none;font-size:22px;line-height:1.5;color:var(--ink2)}
+ul.b>li{padding-left:26px;position:relative;margin-bottom:14px}
+ul.b>li::before{content:'';position:absolute;left:2px;top:.62em;width:10px;height:10px;background:var(--accent);border-radius:2px;transform:rotate(45deg)}
+ul.b>li>strong{color:var(--ink)}
+ul.b ul{list-style:none;margin-top:8px;font-size:calc(1em * 20 / 22)}   /* 20px under a 22px list; relative, so a size utility on the list scales it too */
+ul.b ul>li{padding-left:20px;position:relative;margin-bottom:6px}
+/* .tight: same bullets, less air between them -- for a list that has to share a
+   column with an equation or a note. Reach for this before shrinking the type. */
+ul.b.tight>li{margin-bottom:7px}
+ul.b.tight ul>li{margin-bottom:3px}
+ul.b ul>li::before{content:'–';position:absolute;left:0;color:var(--accent)}
+/* .big / .small and the other size utilities live at the END of the sheet */
+.cjk{font-family:var(--cjk)}
+.acc{color:var(--accent);font-weight:700}
+.blue{color:var(--blue);font-weight:600}
+.green{color:var(--green);font-weight:600}
+.gold{color:var(--gold);font-weight:600}
+.dim{color:var(--muted)}
+/* Bare paragraphs. :where() keeps this at element specificity, so .dim, .acc
+   or a size utility on the <p> still wins. */
+:where(.slide) p{color:var(--ink2);line-height:1.45}
+:where(.slide.dark) p{color:var(--on-dark2)}
+/* ---------------- links ----------------
+   The click-to-advance handler at the bottom of the file already bails on any
+   click that lands inside an <a>, so following a link never also flips the
+   slide -- do not remove that guard. Chromium keeps <a href> as a clickable
+   annotation in the exported PDF, so links survive `export_pdf.py`.
+     <a href="https://..." target="_blank" rel="noopener">text</a>   external
+     <a href="#7">slide 7</a>                                        deep link
+     <a class="url" href="...">runs/encoder_eval/2026-09-11</a>      literal path
+   Always give an external link target="_blank": without it you navigate the
+   deck away mid-talk. */
+a{
+  color:var(--accent);text-decoration:none;
+  border-bottom:1px solid rgba(179,67,46,.35);
+  transition:color .15s,border-color .15s;
+}
+a:hover{color:var(--accent-dark);border-bottom-color:var(--accent-dark)}
+.slide.dark a{color:var(--accent-on-dark);border-bottom-color:rgba(224,149,111,.42)}
+.slide.dark a:hover{color:#f0b48f;border-bottom-color:#f0b48f}
+/* a path or URL shown literally rather than as prose */
+a.url{font-family:var(--mono);font-size:.92em;color:var(--blue);border-bottom:none}
+.slide.dark a.url{color:#9dbdd8}
+.note{
+  font-size:17px;color:var(--ink2);
+  background:var(--paper2);border-left:4px solid var(--accent);
+  padding:12px 16px;border-radius:0 8px 8px 0;
+  line-height:1.45;
+}
+.takeline{
+  margin-top:auto;
+  font-family:var(--serif);font-size:22px;font-style:italic;color:var(--accent-dark);
+  border-top:1px solid var(--line);padding-top:14px;
+}
+/* .sm: the compact note / takeline, for a slide already carrying a table or figure */
+.note.sm{font-size:15px;padding:10px 14px;line-height:1.4}
+.takeline.sm{font-size:19px;padding-top:11px}
+/* ---------------- block quote ----------------
+   A verbatim passage from a source -- as opposed to .note, which is our own
+   aside. Set in the deck's serif with a hanging rule; no quotation glyphs,
+   since the rule already marks it. <cite> carries the attribution. */
+blockquote{
+  font-family:var(--serif);font-size:19px;line-height:1.45;
+  color:var(--ink2);text-align:left;
+  border-left:3px solid var(--line);
+  padding:2px 0 2px 18px;
+}
+blockquote cite{
+  display:block;margin-top:8px;
+  font-family:var(--sans);font-style:normal;font-size:14px;color:var(--muted);
+}
+blockquote cite::before{content:'\2014\00a0'}
+.slide.dark blockquote{color:var(--on-dark2);border-left-color:var(--dark-line)}
+/* math (hand-set) */
+.m{font-family:var(--serif);font-style:italic}
+.mr{font-family:var(--serif);font-style:normal}
+.eq{
+  font-family:var(--serif);font-size:24px;color:var(--ink);
+  background:var(--paper2);
+  border:1px solid var(--line);border-radius:10px;
+  padding:16px 22px;text-align:center;line-height:1.6;
+}
+.eq .op{font-style:normal}
+sub,sup{font-size:.68em}
+/* ---------------- KaTeX ----------------
+   Vendored under assets/katex/ (woff2 only) rather than CDN-linked: these decks
+   have to render and print with no network. Delimiters are set in the loader at
+   the bottom of the file -- $...$ and \(...\) inline, $$...$$ and \[...\] display.
+   The hand-set .m / .mr spans still work; use KaTeX when the expression has
+   structure (fractions, sums with limits, matrices) and .m for a lone variable
+   in running prose, which stays in the deck's own serif. */
+.katex{font-size:1.04em}
+/* The global border-box reset breaks KaTeX's internal strut arithmetic. */
+.katex,.katex *{box-sizing:content-box}
+.katex-display{margin:0}                 /* .eq supplies the spacing */
+.slide.dark .katex{color:var(--on-dark)}
+.eq .katex{font-size:1.1em}
+/* ---------------- figures ---------------- */
+figure.fig{display:flex;flex-direction:column;align-items:center;min-height:0;gap:10px}
+figure.fig img{
+  max-width:100%;max-height:100%;object-fit:contain;
+  background:var(--surface);border:1px solid var(--line);border-radius:8px;
+  box-shadow:0 2px 10px rgba(var(--shadow),.07);
+  padding:8px;
+  min-height:0;
+}
+figure.fig figcaption{font-size:15px;color:var(--muted);text-align:center;line-height:1.35}
+.fig.bare img{background:transparent;border:none;box-shadow:none;padding:0}
+/* .src credits a borrowed figure or claim, in a figcaption or in prose:
+     <span class="src">Caron et al., NeurIPS 2020, fig. 1.</span>   or   <span class="src">[2]</span> */
+.src{color:var(--muted);font-size:.92em;font-style:normal}
+/* ---------------- figure callouts ----------------
+   Label a figure in the deck's ink instead of baking the text into the PNG.
+   Wrap the <img> in .fig-wrap so the coordinates are the image's own, then drop
+   .callout spans positioned by --x / --y (0-100, from the top left):
+     <figure class="fig bare"><span class="fig-wrap">
+       <img src="..." style="max-height:420px">
+       <span class="callout acc" style="--x:62;--y:30">misread radical</span>
+     </span><figcaption>...</figcaption></figure>
+   .acc / .blue tint the pill. Give the <img> an explicit max-height -- a
+   percentage one has no height to resolve against inside the shrink-wrapping
+   .fig-wrap -- and prefer .fig.bare, so the 8px matte does not shift --x/--y. */
+.fig-wrap{position:relative;display:inline-block;min-height:0;max-width:100%}
+.callout{
+  position:absolute;left:calc(var(--x,50) * 1%);top:calc(var(--y,50) * 1%);transform:translate(-50%,-50%);
+  font-size:13px;font-weight:700;line-height:1.15;white-space:nowrap;
+  background:var(--ink);color:var(--paper);padding:3px 9px;border-radius:5px;
+  box-shadow:0 2px 8px rgba(var(--shadow),.28);
+}
+.callout.acc{background:var(--accent)}
+.callout.blue{background:var(--blue)}
+/* ---------------- before / after ----------------
+   Two panels in a labelled comparison -- OCR input vs corrected output, ours vs
+   theirs. .ba is the row, each .ba-p a panel (a figure, a table or prose) under
+   a .ba-t pill label (.good tints it green, .bad accent); .vs is the divider
+   between them, an arrow (&rarr;) or the word "vs", centred on the panels. Put
+   .grow on a figure inside a panel so it takes the panel's height. */
+.ba{display:flex;align-items:stretch;gap:22px;flex:1;min-height:0}
+.ba-p{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;min-height:0}
+.ba-t{
+  align-self:flex-start;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:#fff;background:var(--ink2);padding:3px 11px;border-radius:99px;
+}
+.ba-t.good{background:var(--green)}
+.ba-t.bad{background:var(--accent)}
+.ba .vs{align-self:center;flex:none;font-family:var(--serif);font-size:34px;color:var(--muted)}
+/* ---------------- references ----------------
+   ol.refs numbers itself [1], [2] ... in accent. .ti = title, .ve = venue & year.
+   Two columns by default; ol.refs.one for one. */
+ol.refs{list-style:none;counter-reset:ref;columns:2;column-gap:44px;font-size:15px;line-height:1.4;color:var(--ink2)}
+ol.refs.one{columns:1}
+ol.refs>li{counter-increment:ref;position:relative;padding-left:36px;margin-bottom:10px;break-inside:avoid}
+ol.refs>li::before{
+  content:'[' counter(ref) ']';position:absolute;left:0;top:0;
+  color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;
+}
+ol.refs .ti{font-family:var(--serif);font-style:italic;color:var(--ink)}
+ol.refs .ve{color:var(--muted)}
+/* ---------------- tables ---------------- */
+table.tbl{
+  border-collapse:collapse;width:100%;
+  font-size:19px;font-variant-numeric:tabular-nums;
+  background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;
+}
+table.tbl th,table.tbl td{padding:8px 14px;text-align:center}
+table.tbl th{
+  background:var(--ink);color:var(--paper);
+  font-weight:600;font-size:17px;letter-spacing:.02em;
+}
+table.tbl td:first-child,table.tbl th:first-child{text-align:left}
+table.tbl tr:nth-child(even) td{background:var(--paper2)}
+table.tbl td.hl{color:var(--accent);font-weight:700}
+table.tbl tr.base td{color:var(--muted);font-style:italic}
+/* density: .dense for a dozen rows, .dense.tight tighter still, .xsm for a
+   backup slide. Reach for these before an inline font-size. */
+table.tbl.dense{font-size:15px}
+table.tbl.dense th,table.tbl.dense td{padding:3px 10px}
+table.tbl.dense th{font-size:13px}
+table.tbl.dense.tight th,table.tbl.dense.tight td{padding:2px 10px}
+table.tbl.xsm{font-size:14px}
+table.tbl.xsm th,table.tbl.xsm td{padding:3px 8px}
+table.tbl.xsm th{font-size:12px}
+/* table.bars: a value bar behind each td.v, in the row's family wash (--w).
+   The script sizes it from the cell text against data-max on the table
+   (default 100; data-decimal="," reads 1,70 as 1.70); a cell with its own
+   style="--v:42" keeps it. td.na = no value
+   (muted, no bar), td.meth = the method name. No image: the number stays text. */
+table.tbl.bars tr:nth-child(even) td{background:transparent}
+table.tbl.bars td.v{position:relative;z-index:0;text-align:right;padding-right:12px}
+table.tbl.bars td.v::before{
+  content:'';position:absolute;inset:2px auto 2px 3px;z-index:-1;
+  width:calc(var(--v,0) * 0.9%);background:var(--w,var(--ink-w));border-radius:2px;
+}
+table.tbl.bars td.v.na::before{display:none}
+table.tbl.bars td.v.na{color:var(--muted)}
+table.tbl.bars td.meth{font-weight:600}
+/* marks: a qualitative cell for a feature table -- lighter than a Harvey ball
+   (.hb) when the answer is only yes / no / partial rather than a score out of
+   four. Colour AND glyph, so it still reads in greyscale print.
+     <span class="mk yes"></span>   .no   .part */
+.mk{display:inline-block;width:21px;height:21px;line-height:21px;text-align:center;border-radius:50%;font-size:13px;font-weight:700;vertical-align:-5px}
+.mk::before{display:block}
+.mk.yes{background:var(--green-w);color:var(--green)}
+.mk.yes::before{content:'\2713'}
+.mk.no{background:var(--ink-w);color:var(--muted)}
+.mk.no::before{content:'\2715'}
+.mk.part{background:var(--gold-w);color:var(--gold)}
+.mk.part::before{content:'\2013'}
+/* ---------------- stat chips ---------------- */
+.stats{display:flex;gap:20px;flex-wrap:wrap}
+.stats.stack{flex-direction:column}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:16px 22px;min-width:150px;flex:1;
+  box-shadow:0 2px 8px rgba(var(--shadow),.05);
+}
+.stat .v{font-family:var(--serif);font-size:38px;font-weight:700;color:var(--accent);line-height:1.1}
+.stat .k{font-size:15px;color:var(--ink2);margin-top:4px;line-height:1.3}
+/* finds: a number facing the sentence that explains it -- for 3-5 results that
+   each need a clause, where a .stat would only give them a label */
+.finds{display:flex;flex-direction:column}
+.find{display:flex;gap:22px;align-items:baseline;padding:11px 0;border-bottom:1px solid var(--line)}
+.find:last-child{border-bottom:none}
+.find .q{
+  font-family:var(--serif);font-size:32px;font-weight:700;color:var(--accent);
+  flex:none;width:120px;text-align:right;font-variant-numeric:tabular-nums;
+}
+.find .t{font-size:17px;line-height:1.42;color:var(--ink2)}
+.find .t b{color:var(--ink)}
+/* ---------------- hero number ----------------
+   One statistic as the whole slide, for the beat where a single number IS the
+   argument -- not a fourth stat chip. .hero centres it: .v the giant serif
+   number (a <small> inside for the unit), .k the caption, .sub an optional
+   qualifying line. Works on a dark slide too. */
+.hero{margin:auto;text-align:center;max-width:1000px}
+.hero .v{font-family:var(--serif);font-weight:700;font-size:150px;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+.hero .v small{font-size:.4em;font-weight:600;color:var(--ink2);margin-left:.12em}
+.hero .k{font-size:26px;line-height:1.35;color:var(--ink);margin-top:16px}
+.hero .sub{font-family:var(--serif);font-style:italic;font-size:19px;color:var(--muted);margin-top:12px}
+.slide.dark .hero .v{color:var(--accent-on-dark)}
+.slide.dark .hero .k{color:var(--on-dark)}
+.slide.dark .hero .sub{color:var(--on-dark2)}
+/* ---------------- pull-quote ----------------
+   A quotation as the whole slide -- larger and centred, distinct from the inline
+   blockquote. A washed accent quotation mark opens it; <cite> attributes it (the
+   blockquote rule above adds the em-dash). */
+blockquote.pull{
+  margin:auto;max-width:1000px;border:none;padding:0 0 0 66px;position:relative;
+  font-size:37px;line-height:1.32;color:var(--ink);
+}
+blockquote.pull::before{
+  content:'\201C';position:absolute;left:-4px;top:-.16em;
+  font-family:var(--serif);font-size:120px;line-height:1;color:var(--accent-w);
+}
+blockquote.pull cite{font-size:19px;margin-top:22px}
+.slide.dark blockquote.pull{color:var(--on-dark)}
+.slide.dark blockquote.pull::before{color:var(--dark-line)}
+/* cards */
+.cards{display:flex;gap:24px;flex:1;min-height:0}
+.card{
+  flex:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  padding:20px 22px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 2px 10px rgba(var(--shadow),.06);min-width:0;
+}
+/* .card h3 is the global h3 above; its margin is zeroed by the flex-gap rule */
+.card .tag{align-self:flex-start}
+.card p{font-size:18px;line-height:1.45;color:var(--ink2)}
+.card .eq{font-size:19px;padding:10px 12px}
+/* .card.sm: four-up cards; the title takes the card's family colour */
+.card.sm{padding:15px 17px;gap:7px}
+.card.sm h3{font-size:20px;color:var(--fc,var(--ink))}
+.card.sm p{font-size:15.5px;line-height:1.42}
+/* ---------------- tags & family colours ----------------
+   A family class sets two custom properties that components read: --fc, the
+   solid hue (a .tag pill, a .card.sm title), and --w, its light wash (the value
+   bar in table.bars). Put it on a .tag, a .card or a <tr>; children inherit.
+   When the families have names, alias them per deck:
+     .f-pred{--fc:var(--gold);--w:var(--gold-w)} */
+.fc-accent{--fc:var(--accent);--w:var(--accent-w)}
+.fc-blue  {--fc:var(--blue);  --w:var(--blue-w)}
+.fc-green {--fc:var(--green); --w:var(--green-w)}
+.fc-gold  {--fc:var(--gold);  --w:var(--gold-w)}
+.fc-ink   {--fc:var(--ink2);  --w:var(--ink-w)}
+.tag{
+  display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 10px;border-radius:99px;color:#fff;background:var(--fc,var(--ink2));
+}
+.tagrow{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+/* ---------------- dark (section/title) slides ---------------- */
+.slide.dark{background:var(--dark-bg);color:var(--on-dark)}
+.slide.dark :is(h1,h2,h3,h4){color:var(--on-dark)}
+.slide.dark h5{color:var(--on-dark2)}
+.slide.dark h6{color:var(--on-dark3)}
+.slide.dark :is(h1,h2,h3,h4,h5,h6) .thin{color:var(--on-dark2)}
+.slide.dark .kicker{color:var(--accent-on-dark)}
+.slide.dark .foot{color:var(--on-dark3);border-top-color:var(--dark-line)}
+.vstrip{
+  position:absolute;top:0;bottom:0;right:64px;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:var(--cjk);font-size:74px;letter-spacing:.28em;
+  color:rgba(250,247,240,.10);
+  display:flex;align-items:center;user-select:none;pointer-events:none;
+}
+.slide:not(.dark) .vstrip{color:rgba(var(--shadow),.055)}
+/* title slide */
+.titlebox{margin:auto 0;max-width:900px}
+.titlebox .over{font-size:17px;letter-spacing:.3em;text-transform:uppercase;color:var(--accent-on-dark);font-weight:700;margin-bottom:26px}
+.titlebox h1{font-size:58px;margin-bottom:22px}
+.titlebox .sub{font-family:var(--serif);font-size:26px;font-style:italic;color:var(--on-dark2);line-height:1.45;margin-bottom:48px}
+.titlebox .who{font-size:21px;color:var(--on-dark)}
+.titlebox .who .aff{color:var(--on-dark3);font-size:18px;margin-top:6px}
+/* agenda */
+ol.agenda{list-style:none;counter-reset:ag;font-size:23px;columns:2;column-gap:70px}
+ol.agenda li{
+  counter-increment:ag;margin-bottom:20px;padding-left:56px;position:relative;
+  break-inside:avoid;color:var(--ink);line-height:1.3;
+}
+ol.agenda li::before{
+  content:counter(ag,upper-roman);
+  position:absolute;left:0;top:0;
+  font-family:var(--serif);font-weight:700;font-size:22px;color:var(--accent);
+}
+ol.agenda li .d{display:block;font-size:16px;color:var(--muted);margin-top:2px}
+/* an item that links to a slide (<li><a href="#results">) gets that slide's
+   number, span.pg, from deck.js: flush right on the item's first line, in the
+   item's own type so the baselines agree. .nonum hides them. */
+ol.agenda li a{color:inherit;border-bottom:none}
+ol.agenda li .pg{float:right;margin-left:18px;color:var(--muted);font-variant-numeric:tabular-nums}
+ol.agenda li.cur .pg{color:inherit}
+.slide.dark ol.agenda li .pg{color:var(--on-dark3)}
+ol.agenda.nonum .pg{display:none}
+/* pipeline step list */
+.steps{display:flex;flex-direction:column;gap:9px}
+/* The overview runs long; it alone needs slightly tighter leading. */
+#overview .steps{gap:10px}
+/* The body of a step is running prose, so it must stay in normal inline flow —
+   a flex container here promotes every <strong>/<em>/<span> to its own column. */
+.step{
+  font-size:19px;line-height:1.45;color:var(--ink2);
+  padding-left:32px;position:relative;
+}
+.step .n{
+  flex:none;width:30px;height:30px;border-radius:50%;
+  background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;align-self:center;
+}
+.step b{color:var(--ink)}
+.step>b:first-child{
+  position:absolute;left:0;top:0;width:24px;
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+/* code block */
+pre.code{
+  font-family:var(--mono);font-size:15px;line-height:1.5;
+  color:var(--ink);background:var(--paper2);
+  border:1px solid var(--line);border-radius:10px;
+  padding:12px 16px;margin-top:14px;overflow-x:auto;
+}
+pre.code b{color:var(--accent)}
+/* ---------------- svg diagrams ----------------
+   Hand-drawn inline SVG styled by class, never by fill="#hex", so a diagram
+   follows the :root tokens like the rest of the slide. Arrowheads are a
+   <marker> whose path takes .head (.head.acc for an accent edge). Give the
+   <svg> width:100% plus a max-height, and set font-size on it in viewBox units.
+   Ids inside are fine: the overview / presenter clones rename them. */
+.diagram{display:flex;flex-direction:column;align-items:center;gap:8px}
+.diagram .cap{font-size:15px;color:var(--muted);text-align:center}
+.diagram svg{font-family:var(--sans)}
+.diagram svg text{fill:var(--ink2)}
+.diagram svg text.t{fill:var(--ink);font-weight:600}
+.diagram svg text.lbl{fill:var(--muted)}
+.diagram svg text.acc{fill:var(--accent)}
+.diagram svg .box{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.diagram svg .box.soft{fill:var(--paper2)}
+.diagram svg .box.acc{fill:var(--accent-w);stroke:var(--accent)}
+.diagram svg .box.blue{fill:var(--blue-w);stroke:var(--blue)}
+.diagram svg .edge{fill:none;stroke:var(--ink2);stroke-width:1.6}
+.diagram svg .edge.acc{stroke:var(--accent);stroke-width:2.2}
+.diagram svg .edge.dash{stroke-dasharray:6 5}
+.diagram svg .head{fill:var(--ink2)}
+.diagram svg .head.acc{fill:var(--accent)}
+/* ---------------- timeline ----------------
+   A horizontal sequence -- related work by year, a method's lineage, a project's
+   phases. Each .ev is a point on a shared line: .yr the year above, .dot the
+   marker, .lab the note below (b = its name). .ev.on is the current / our point
+   (accent). Reads left to right; three to six points sit cleanly. Spacing is
+   even, not to scale -- for a dated plan with overlapping bars use .gantt. */
+.timeline{position:relative;display:flex;align-items:flex-start}
+.timeline::before{content:'';position:absolute;left:6%;right:6%;top:40px;height:2px;background:var(--line)}
+.timeline .ev{flex:1;min-width:0;text-align:center;padding:0 8px}
+.timeline .yr{height:28px;line-height:28px;font-family:var(--serif);font-weight:700;font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
+.timeline .dot{position:relative;width:14px;height:14px;margin:6px auto 0;border-radius:50%;background:var(--surface);border:2.5px solid var(--ink2)}
+.timeline .ev.on .yr{color:var(--accent)}
+.timeline .ev.on .dot{background:var(--accent);border-color:var(--accent)}
+.timeline .lab{margin-top:12px;font-size:15px;line-height:1.32;color:var(--ink2)}
+.timeline .lab b{display:block;color:var(--ink);font-size:16px}
+.slide.dark .timeline::before{background:var(--dark-line)}
+.slide.dark .timeline .yr,.slide.dark .timeline .lab b{color:var(--on-dark)}
+.slide.dark .timeline .lab{color:var(--on-dark2)}
+/* keyboard help + progress UI (screen only) */
+#ui{position:fixed;left:0;right:0;bottom:0;pointer-events:none;z-index:50}
+#bar{height:4px;background:var(--accent);width:0%;transition:width .2s}
+#help{
+  position:fixed;top:14px;right:16px;color:rgba(250,247,240,.4);
+  font-size:12px;font-family:var(--mono);z-index:50;pointer-events:none;
+}
+/* ---------------- builds ----------------
+   .frag elements appear one per forward keypress before the deck moves on;
+   the back key hides them again, and arriving from the next slide shows them
+   all. data-frag="n" orders and groups builds; without it, a .frag's number is
+   its position among the slide's .frag elements. .then-dim fades a build once a
+   later one shows. Hidden by opacity, never display, so the slide has the same
+   geometry in every state: check_overflow.py measures the fully built slide,
+   and the PDF prints every build. */
+.frag{opacity:0;transition:opacity .28s ease}
+.frag:not(.on){pointer-events:none}
+.frag.on{opacity:1}
+.frag.then-dim.past{opacity:.38}
+/* speaker notes: only ever shown in the presenter view (S) */
+aside.notes{display:none}
+/* ---------------- overview (O) and jump-to-slide (12 Enter) ---------------- */
+#sorter{position:fixed;inset:0;z-index:60;overflow-y:auto;background:rgba(20,17,13,.97);padding:26px 32px 48px}
+#sorter .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+#sorter .sec{
+  grid-column:1/-1;margin-top:10px;
+  font-size:13px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e0956f;
+}
+#sorter .th{cursor:pointer;min-width:0}
+#sorter .frame{position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:4px;outline:3px solid transparent;outline-offset:3px}
+#sorter .th:hover .frame{outline-color:rgba(240,180,143,.45)}
+#sorter .th.cur .frame{outline-color:var(--accent)}
+#sorter .th.sel .frame{outline-color:#f0b48f}
+#sorter .lab{display:flex;gap:10px;margin-top:8px;font-size:12px;color:#8a8071}
+#sorter .lab span:first-child{flex:none;font-family:var(--mono);color:#cfc6b4}
+#sorter .lab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sorter .frame>.slide,#pv .stage>.slide{transform-origin:0 0;transform:scale(var(--s,.2));pointer-events:none}
+#jump{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;pointer-events:none;
+  background:rgba(20,17,13,.92);color:var(--paper);border-radius:12px;padding:10px 34px;
+  font-family:var(--serif);font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;
+}
+/* ---------------- presenter view (S opens it in its own window) ---------------- */
+body.presenter{display:block}
+body.presenter>#deck,body.presenter>#ui,body.presenter>#help{display:none}
+#pv{
+  position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);
+  gap:22px;padding:18px 22px;color:#cfc6b4;
+}
+#pv>section{display:flex;flex-direction:column;gap:8px;min-height:0}
+#pv .bar{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:#8a8071}
+#pv .bar b{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:#e0956f}
+#pv .stage{position:relative;flex:none;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:6px;background:#000}
+#pv .now .stage{width:min(100%,calc((100vh - 70px) * 16 / 9))}
+#pv .end{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#8a8071}
+#pv .clock{display:flex;justify-content:space-between;align-items:baseline;margin-top:6px}
+#pv .timer{font:700 40px var(--mono);color:var(--paper);background:none;border:0;padding:0;cursor:pointer}
+#pv .wall{font:400 22px var(--mono);color:#8a8071}
+#pv .notes{
+  flex:1;min-height:0;overflow-y:auto;
+  background:#211d19;border:1px solid #453d33;border-radius:8px;padding:14px 18px;
+  font-size:21px;line-height:1.5;color:#efe8da;
+}
+#pv .notes p+p{margin-top:.6em}
+#pv .notes .none{color:#8a8071;font-style:italic}
+/* ---------------- key list (?) ---------------- */
+#keys{position:fixed;inset:0;z-index:75;display:flex;align-items:center;justify-content:center;background:rgba(20,17,13,.72)}
+#keys[hidden]{display:none}
+#keys .box{
+  background:#211d19;color:#e8e1d2;border:1px solid #453d33;border-radius:12px;
+  padding:22px 28px 18px;font-family:var(--sans);font-size:15px;max-width:calc(100vw - 32px);
+}
+#keys h2{font-family:var(--serif);font-size:24px;color:var(--paper);margin-bottom:12px}
+#keys td{padding:5px 0;vertical-align:baseline}
+#keys td:first-child{font-family:var(--mono);font-size:13px;color:#f0b48f;padding-right:26px;white-space:nowrap}
+/* ---------------- authoring mode (D) ----------------
+   Screen only, and off unless toggled: a dashed guide on the content box, the
+   footer zone hatched, builds shown, spill past the slide edge left visible,
+   overflowing elements outlined in red, and the #dev problem panel. */
+@media screen{
+  body.dev #deck .slide.active{overflow:visible}
+  body.dev #deck .slide.active::after{
+    content:'';position:absolute;inset:54px 72px 46px;pointer-events:none;z-index:40;
+    outline:1px dashed rgba(43,74,111,.5);
+  }
+  body.dev #deck .slide.active::before{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:42px;pointer-events:none;z-index:40;
+    background:repeating-linear-gradient(-45deg,rgba(179,67,46,.10) 0 6px,transparent 6px 12px);
+  }
+  body.dev #deck .frag{opacity:1;outline:1px dashed var(--gold);outline-offset:2px}
+  body.dev #deck .dev-over{outline:2px solid #d62d20;outline-offset:-1px;background-color:rgba(214,45,32,.07)}
+  #dev{
+    position:fixed;left:12px;bottom:14px;z-index:65;width:min(460px,calc(100vw - 24px));max-height:42vh;overflow:auto;
+    background:rgba(20,17,13,.95);color:#e8e1d2;border:1px solid #453d33;border-radius:8px;
+    font:12px/1.5 var(--mono);padding:9px 12px;
+  }
+  #dev .hd{display:flex;justify-content:space-between;gap:12px;margin-bottom:4px;color:#e0956f;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+  #dev .hd span:last-child{color:#8a8071;font-weight:400;letter-spacing:0;text-transform:none}
+  #dev .where{color:#cfc6b4;margin-bottom:6px}
+  #dev ul{list-style:none}
+  #dev li{padding:3px 0;border-top:1px solid #2c261f;cursor:pointer}
+  #dev li:hover,#dev li.here{color:#fff}
+  #dev li b{color:#f0b48f}
+  #dev .ok{color:#9fcfae}
+}
+/* ==========================================================================
+   EXECUTIVE LAYER -- consulting-style components for board and C-suite decks.
+   Opt in with <html data-theme="board"> and <div id="deck" data-tracker>; every
+   class also works on the manuscript theme. executive.html uses each of them,
+   with the class names in a comment above every slide.
+   ========================================================================== */
+/* ---- slide chrome ----
+   .tracker   stamped by deck.js top left on each content slide when #deck has
+              data-tracker: one chip per section, the current one filled
+   .sticker   stamped top right from data-sticker (on the slide, or on #deck)
+   h1.action  the slide's conclusion as a full sentence, two lines at most --
+              authoring mode (D) flags a third. Read only the h1s, in order:
+              the argument must still hold (O, then T, shows exactly that).
+   .lead      one line under the action title: scope, unit, period
+   .source    "Source: ..." under the body; pins itself to the bottom edge
+   .sowhat    the implication, in an ink panel -- one per slide at most */
+.tracker{
+  position:absolute;left:72px;top:18px;display:flex;gap:6px;pointer-events:none;
+  font-size:11.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;line-height:1.3;
+}
+.tracker span{padding:2px 9px;border-radius:3px;color:var(--ink2);border:1px solid var(--line)}
+.tracker span.on{color:var(--paper);background:var(--ink);border-color:var(--ink)}
+.sticker{
+  position:absolute;right:72px;top:16px;pointer-events:none;
+  font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;line-height:1.3;
+  color:var(--accent);border:1.5px solid var(--accent);border-radius:3px;padding:3px 10px;
+}
+.slide.dark .sticker{color:var(--accent-on-dark);border-color:var(--accent-on-dark)}
+.slide h1.action{font-size:32px;line-height:1.22;margin-bottom:18px;max-width:1090px;text-wrap:balance}
+.lead{font-size:19px;line-height:1.4;color:var(--ink2);margin:-6px 0 20px}
+.source{margin-top:auto;padding-top:10px;font-size:12.5px;line-height:1.4;color:var(--muted)}
+.takeline+.source,.source+.source{margin-top:0}
+.sowhat{
+  background:var(--ink);border-radius:10px;padding:16px 20px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.slide .sowhat>h6{color:var(--accent-on-dark);margin:0}
+.sowhat p{font-size:17px;line-height:1.45;color:var(--paper)}
+.sowhat :is(b,strong){color:var(--paper)}
+/* ---- executive summary ----
+   .scr > .row > .lbl + .txt   Situation / Complication / Resolution; .row.res
+                               is the answer and takes the accent rule
+   .answer                     the governing thought as a band: the one
+                               sentence the Board should repeat */
+.scr{display:flex;flex-direction:column}
+.scr .row{display:grid;grid-template-columns:180px 1fr;gap:28px;padding:13px 0;border-top:1px solid var(--line)}
+.scr .row:last-child{border-bottom:1px solid var(--line)}
+.scr .lbl{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding-top:5px}
+.scr .txt{font-size:19px;line-height:1.45;color:var(--ink2)}
+.scr .txt :is(b,strong){color:var(--ink)}
+.scr .row.res{border-top:2px solid var(--accent)}
+.scr .row.res .lbl{color:var(--accent-dark)}
+.scr .row.res .txt{color:var(--ink)}
+.answer{
+  font-family:var(--serif);font-size:22px;line-height:1.38;color:var(--paper);
+  background:var(--ink);border-left:6px solid var(--accent);border-radius:0 10px 10px 0;padding:15px 22px;
+}
+/* ---- numbers for a board ----
+   .kpis > .kpi   .v the number (a <small> inside for the unit), .k what it is,
+                  .delta the change; .kpi.hl is the one that matters
+   .delta.up / .down / .flat   add the arrow; .good / .bad colour it, because
+                  up is good for revenue and bad for cost -- never infer it */
+.kpis{display:flex;gap:28px}
+.kpi{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;border-top:3px solid var(--ink);padding-top:14px}
+.kpi.hl{border-top-color:var(--accent)}
+.kpi .v{
+  font-family:var(--serif);font-size:54px;font-weight:700;line-height:1.05;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.kpi.hl .v{color:var(--accent)}
+.kpi .v small{font-size:.42em;font-weight:600;color:var(--ink2);margin-left:5px}
+.kpi .k{font-size:16.5px;line-height:1.38;color:var(--ink2)}
+.delta{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.delta.up::before{content:'\25B2\00a0'}
+.delta.down::before{content:'\25BC\00a0'}
+.delta.flat::before{content:'\2192\00a0'}
+.delta.good{color:var(--green)}
+.delta.bad{color:var(--accent)}
+/* ol.hbars: a ranked bar chart written as a list --
+     <ol class="hbars" data-max="50" data-unit="%"><li data-v="41">Variant forms</li> ...
+   deck.js adds the track and the value (data-label on an li overrides the
+   printed value); li.hl is accent, .fc-* on an li picks its family colour.
+   data-max defaults to the largest value. --lw sets the label column width. */
+ol.hbars{list-style:none;display:flex;flex-direction:column;gap:11px}
+ol.hbars>li{display:grid;grid-template-columns:var(--lw,300px) 1fr 70px;align-items:center;gap:16px;font-size:18px;line-height:1.25;color:var(--ink2)}
+ol.hbars .t{position:relative;height:26px;background:var(--paper2);border-radius:3px;overflow:hidden}
+ol.hbars .t i{position:absolute;inset:0 auto 0 0;width:calc(var(--v,0) * 1%);background:var(--fc,var(--ink2));border-radius:3px}
+ol.hbars>li.hl{color:var(--ink);font-weight:600}
+ol.hbars>li.hl .t i{background:var(--accent)}
+ol.hbars .n{text-align:right;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+/* .waterfall: the bridge from one total to another --
+     <div class="waterfall" data-unit="M" data-decimals="1" data-good="down">
+       <div class="total" data-v="4.1">Cost today</div>
+       <div data-v="-1.2">Automated keying</div> ...
+       <div class="total">Cost in year 3</div>        no data-v: the running sum
+   deck.js draws bars, values and connectors. A rise is green and a fall accent;
+   data-good="down" swaps that for cost bridges. Running totals must stay >= 0.
+   Set the chart height with style="height:..." (default 340px). */
+.waterfall{display:flex;gap:14px;height:340px}
+.waterfall>.wf{flex:1;min-width:0;display:flex;flex-direction:column}
+.waterfall .wf-plot{position:relative;flex:1;border-bottom:1.5px solid var(--ink)}
+.waterfall .wf-bar{
+  position:absolute;left:8%;right:8%;min-height:2px;
+  bottom:calc(var(--lo) * 1%);height:calc((var(--hi) - var(--lo)) * 1%);
+  background:var(--wf,var(--ink));
+}
+.waterfall .wf-val{
+  position:absolute;left:0;right:0;bottom:calc(var(--hi) * 1% + 5px);
+  text-align:center;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.waterfall .wf-plot::after{
+  content:'';position:absolute;left:92%;width:calc(16% + 14px);bottom:calc(var(--end) * 1%);
+  border-top:1px dashed var(--muted);
+}
+.waterfall>.wf:last-child .wf-plot::after{display:none}
+.waterfall .wf-lab{height:50px;overflow:hidden;padding-top:8px;font-size:14px;line-height:1.3;text-align:center;color:var(--ink2)}
+.waterfall .wf.up{--wf:var(--green)}
+.waterfall .wf.down{--wf:var(--accent)}
+.waterfall[data-good="down"] .wf.up{--wf:var(--accent)}
+.waterfall[data-good="down"] .wf.down{--wf:var(--green)}
+.waterfall .wf.total{--wf:var(--ink)}
+.waterfall .wf.total .wf-lab{font-weight:700;color:var(--ink)}
+/* .stack100: one bar that sums to 100 --
+     <div class="stack100"><i class="fc-blue" style="--v:62">Printed 62%</i> ... */
+.stack100{display:flex;gap:2px;height:44px;border-radius:6px;overflow:hidden}
+.stack100>i{
+  flex:var(--v,1) 1 0;min-width:0;display:flex;align-items:center;justify-content:center;padding:0 6px;
+  font-style:normal;font-size:14px;font-weight:700;color:#fff;background:var(--fc,var(--ink2));
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.kpis.stack{flex-direction:column;gap:22px}
+/* ---- assessment marks ----
+   .hb data-v="0".."4"   Harvey ball, in quarters; say what a full ball means in the .source
+   .rag.g / .a / .r      a status dot beside its word -- the word carries the meaning
+   .lvl.hi / .md / .lo   a severity pill
+   table.tbl .rec        the recommended column, washed in accent; td.l left-aligns a cell */
+.hb{
+  display:inline-block;width:20px;height:20px;border-radius:50%;vertical-align:-4px;
+  border:2px solid var(--ink);background:conic-gradient(var(--ink) calc(var(--q,0) * 25%),var(--surface) 0);
+}
+.hb[data-v="1"]{--q:1}
+.hb[data-v="2"]{--q:2}
+.hb[data-v="3"]{--q:3}
+.hb[data-v="4"]{--q:4}
+.rag{display:inline-flex;align-items:center;gap:7px;font-weight:600;white-space:nowrap}
+.rag::before{content:'';flex:none;width:11px;height:11px;border-radius:50%;background:var(--rag,var(--muted))}
+.rag.g{--rag:var(--green)}
+.rag.a{--rag:var(--gold)}
+.rag.r{--rag:var(--accent)}
+.lvl{
+  display:inline-block;min-width:70px;padding:2px 8px;border-radius:3px;text-align:center;
+  font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;line-height:1.5;
+}
+.lvl.hi{background:var(--accent);color:#fff}
+.lvl.md{background:var(--gold-w);color:var(--ink)}
+.lvl.lo{background:var(--ink-w);color:var(--ink2)}
+table.tbl tr td.rec{background:var(--accent-w)}
+table.tbl tr th.rec{background:var(--accent)}
+table.tbl td.l{text-align:left}
+/* ---- ol.agenda[data-auto] ----
+   deck.js fills it from the sections: data-short as the item, the divider's
+   .sub as its caption, each a link. li.cur is the section this slide sits in,
+   so the same agenda doubles as a "you are here" page. .one: a single column. */
+ol.agenda.one{columns:1}
+.slide.dark ol.agenda li a{color:inherit;border-bottom:none}
+ol.agenda li.cur{color:var(--accent)}
+ol.agenda:has(li.cur) li:not(.cur){color:var(--muted)}
+.slide.dark ol.agenda li{color:var(--on-dark)}
+.slide.dark ol.agenda li::before{color:var(--accent-on-dark)}
+.slide.dark ol.agenda li .d{color:var(--on-dark3)}
+.slide.dark ol.agenda li.cur{color:var(--accent-on-dark)}
+.slide.dark ol.agenda:has(li.cur) li:not(.cur){color:var(--on-dark3)}
+/* ---- .matrix: a 2x2 ----
+     <div class="matrix" data-x="Feasibility" data-y="Value">
+       <span class="q tr">Lead with these</span>            .tl .tr .bl .br
+       <span class="pt hl" style="--x:78;--y:84">Search</span>
+   x and y run 0-100 from the bottom left. The top-right quadrant is washed in
+   accent; .pt.hl fills the dot; .pt.left puts the label left of its dot. */
+.matrix{
+  position:relative;flex:1;min-height:0;margin:0 0 30px 34px;
+  border-left:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink);
+  background:
+    linear-gradient(var(--line),var(--line)) 50% 0/1px 100% no-repeat,
+    linear-gradient(var(--line),var(--line)) 0 50%/100% 1px no-repeat,
+    linear-gradient(var(--accent-w),var(--accent-w)) 100% 0/50% 50% no-repeat;
+}
+.matrix::before,.matrix::after{
+  position:absolute;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+}
+.matrix::before{content:attr(data-y) '\00a0\2192';right:calc(100% + 10px);top:0;bottom:0;writing-mode:vertical-rl;transform:rotate(180deg);text-align:center}
+.matrix::after{content:attr(data-x) '\00a0\2192';left:0;right:0;top:calc(100% + 9px);text-align:center}
+.matrix .q{position:absolute;padding:10px 12px;font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.matrix .q.tl{left:0;top:0}
+.matrix .q.tr{right:0;top:0;color:var(--accent-dark)}
+.matrix .q.bl{left:0;bottom:0}
+.matrix .q.br{right:0;bottom:0}
+.matrix .pt{
+  position:absolute;left:calc(var(--x) * 1%);bottom:calc(var(--y) * 1%);transform:translate(-9px,50%);
+  display:flex;align-items:center;gap:8px;font-size:15px;line-height:1.2;color:var(--ink);white-space:nowrap;
+}
+.matrix .pt::before{
+  content:'';flex:none;width:18px;height:18px;border-radius:50%;
+  background:var(--surface);border:2.5px solid var(--ink2);
+}
+.matrix .pt.hl{font-weight:700}
+.matrix .pt.hl::before{background:var(--accent);border-color:var(--accent)}
+.matrix .pt.left{flex-direction:row-reverse;transform:translate(calc(-100% + 9px),50%)}
+/* ---- .options: two to four options side by side ----
+     <div class="options"><div class="option rec" data-badge="Recommended">
+       <div class="ol">Option B</div> <h3>Hybrid</h3> <p>...</p> <dl class="kv">...</dl>
+   .rec draws the accent frame; data-badge prints the ribbon. dl.kv is a
+   key-value list pinned to the card's foot (dt the key, dd the value). */
+.options{display:flex;gap:22px;flex:1;min-height:0;padding-top:12px}
+.option{
+  flex:1;min-width:0;position:relative;display:flex;flex-direction:column;gap:9px;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:22px 22px 18px;
+}
+.option>:is(h1,h2,h3,h4,h5,h6){margin-bottom:0}
+.option .ol{font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.option p{font-size:16.5px;line-height:1.45;color:var(--ink2)}
+.option.rec{border:2px solid var(--accent);box-shadow:0 8px 24px rgba(var(--shadow),.10)}
+.option[data-badge]::before{
+  content:attr(data-badge);position:absolute;top:-12px;right:18px;padding:3px 10px;border-radius:3px;
+  font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--accent);
+}
+dl.kv{display:grid;grid-template-columns:1fr auto;gap:7px 14px;align-items:center;font-size:15.5px;line-height:1.3}
+.option dl.kv{margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+dl.kv dt{color:var(--ink2)}
+dl.kv dd{color:var(--ink);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+/* ---- ol.chevrons: a process in three to six stages; li.on is this slide's stage ---- */
+ol.chevrons{list-style:none;display:flex}
+ol.chevrons>li{
+  flex:1;min-width:0;min-height:70px;display:flex;flex-direction:column;justify-content:center;gap:2px;
+  padding:10px 16px 10px 36px;background:var(--ink-w);color:var(--ink);
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%,20px 50%);
+}
+ol.chevrons>li+li{margin-left:-11px}
+ol.chevrons>li:first-child{padding-left:20px;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%)}
+ol.chevrons b{font-size:17px;line-height:1.25}
+ol.chevrons span{font-size:13.5px;line-height:1.3;color:var(--ink2)}
+ol.chevrons>li.on{background:var(--accent);color:#fff}
+ol.chevrons>li.on span{color:#fff}
+/* ---- .gantt: a roadmap on a grid of periods ----
+     <div class="gantt" style="--cols:6">
+       <div class="gh"><span>Q4 26</span> ... one span per column</div>
+       <div class="lane"><div class="ln">Workstream<small>scope</small></div><div class="track">
+         <i class="fc-blue" style="--a:2;--b:3">Build</i>       a bar over columns 2 to 3
+         <i class="ms" style="--a:4">Gate 2</i>                  a milestone at the end of column 4
+       </div></div>
+       <i class="today" style="--a:1.4" data-label="Today"></i>  40% into column 1
+   Columns count from 1. .ms.left puts a milestone's label on its left (for the
+   last column). --lw sets the label column (default 220px). */
+.gantt{--lw:220px;position:relative;display:flex;flex-direction:column}
+.gantt .gh{
+  display:grid;grid-template-columns:var(--lw) repeat(var(--cols),minmax(0,1fr));padding-bottom:6px;
+  border-bottom:1.5px solid var(--ink);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+}
+.gantt .gh::before{content:''}
+.gantt .gh span{text-align:center}
+.gantt .lane{display:grid;grid-template-columns:var(--lw) minmax(0,1fr);align-items:stretch;border-bottom:1px solid var(--line)}
+.gantt .ln{align-self:center;padding:8px 14px 8px 0;font-size:16px;font-weight:600;line-height:1.25;color:var(--ink)}
+.gantt .ln small{display:block;font-size:13px;font-weight:400;color:var(--muted)}
+.gantt .track{
+  position:relative;min-height:54px;
+  background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px calc(100% / var(--cols)));
+}
+.gantt .track>i{
+  position:absolute;top:50%;transform:translateY(-50%);height:30px;
+  left:calc((var(--a) - 1) / var(--cols) * 100% + 3px);width:calc((var(--b) - var(--a) + 1) / var(--cols) * 100% - 6px);
+  display:flex;align-items:center;padding:0 10px;border-radius:4px;
+  font-style:normal;font-size:13.5px;font-weight:600;color:#fff;background:var(--fc,var(--ink2));
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.gantt .track>i.ms{
+  left:calc(var(--a) / var(--cols) * 100% - 8px);width:auto;height:auto;padding:0;gap:8px;overflow:visible;
+  background:none;color:var(--ink);font-weight:700;
+}
+.gantt .track>i.ms::before{content:'';flex:none;width:14px;height:14px;margin:0 1px;background:var(--accent);transform:rotate(45deg)}
+.gantt .track>i.ms.left{flex-direction:row-reverse;transform:translate(calc(-100% + 16px),-50%)}
+.gantt>i.today{
+  position:absolute;top:0;bottom:0;pointer-events:none;
+  left:calc(var(--lw) + (100% - var(--lw)) * (var(--a) - 1) / var(--cols));border-left:2px dashed var(--accent);
+}
+.gantt>i.today::after{
+  content:attr(data-label);position:absolute;top:calc(100% + 4px);left:0;transform:translateX(-50%);
+  font-style:normal;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-dark);white-space:nowrap;
+}
+/* ---- ol.asks: the decisions requested, numbered; .by says when each is needed ---- */
+ol.asks{list-style:none;counter-reset:ask;display:flex;flex-direction:column;gap:14px}
+ol.asks>li{
+  counter-increment:ask;position:relative;padding:14px 18px 14px 70px;font-size:19px;line-height:1.4;color:var(--ink2);
+  background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;
+}
+ol.asks>li::before{
+  content:counter(ask);position:absolute;left:18px;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;border-radius:50%;background:var(--ink);color:var(--paper);
+  font:700 17px/36px var(--sans);text-align:center;
+}
+ol.asks>li :is(b,strong){color:var(--ink)}
+ol.asks .by{display:block;margin-top:3px;font-size:14px;color:var(--muted)}
+/* ---- runtime additions: speaker-view pace, black screen (B), storyline overview (O, T) ---- */
+#pv .pace{font:400 15px var(--mono);color:#8a8071}
+#pv .pace.behind{color:#f0b48f}
+#pv .pace.ahead{color:#9fcfae}
+#black{position:fixed;inset:0;z-index:80;background:#000;cursor:none}
+#sorter .hint{margin:-10px 0 14px;font:12px var(--mono);color:#8a8071}
+#sorter.story .grid{grid-template-columns:minmax(0,1fr);gap:2px;max-width:1100px}
+#sorter.story .frame{display:none}
+#sorter.story .lab{margin-top:0;padding:7px 12px;border-radius:5px;font-size:18px;line-height:1.35}
+#sorter.story .lab span:first-child{width:36px;padding-top:3px;font-size:14px}
+#sorter.story .lab span:last-child{white-space:normal;color:#efe8da}
+#sorter.story .th:hover .lab{background:rgba(240,180,143,.08)}
+#sorter.story .th.sel .lab{background:rgba(240,180,143,.16)}
+#sorter.story .th.cur .lab{box-shadow:inset 3px 0 0 var(--accent)}
+/* ---------------- size & spacing utilities ----------------
+   Last in the sheet and scoped under .slide, so they beat the component
+   defaults. (A bare .small used to lose to ul.b, table.tbl and .note on
+   specificity -- which is why decks fell back to style="font-size:17px".)
+     .big 25 · .small 18 · .smaller 17 · .xs 16 · .xxs 15
+     .mt-s 8 · .mt 14 · .mt-l 22   margin-top; also overrides .takeline's auto
+     .nogrow                        flex:none; here so it also beats .cards / .stat (flex:1) */
+.slide .big{font-size:25px}
+.slide .small{font-size:18px}
+.slide .smaller{font-size:17px}
+.slide .xs{font-size:16px;line-height:1.42}
+.slide .xxs{font-size:15px;line-height:1.4}
+.slide .mt-s{margin-top:8px}
+.slide .mt{margin-top:14px}
+.slide .mt-l{margin-top:22px}
+.slide .nogrow{flex:none}
+/* ---------------- print ---------------- */
+@page{size:1280px 720px;margin:0}
+@media print{
+  body{display:block;background:#fff;overflow:visible}
+  #deck{transform:none !important;width:1280px;height:auto}
+  .slide{position:relative;display:flex !important;inset:auto;break-after:page;page-break-after:always}
+  #ui,#help,#jump,#sorter,#pv,#keys,#dev,#black{display:none !important}
+  .frag{opacity:1 !important;transition:none}
+  figure.fig img{box-shadow:none}
+}

@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three seminars</title>
+<link rel="stylesheet" href="sem_slides/assets/katex/katex.min.css">
+<link rel="stylesheet" href="sem_slides/assets/deck.css">
+<style>
+/* Rules for this deck only. The shared design system is assets/deck.css. */
+.verdict{display:grid;grid-template-columns:172px 1fr;gap:4px 14px;align-items:baseline;
+  border-top:1px solid var(--line);padding-top:9px;margin-top:auto;
+  font-size:16px;line-height:1.38;color:var(--ink2)}
+.cols+.verdict,figure+.verdict{margin-top:14px}
+.verdict .vk{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:700}
+.verdict .vk.pro{color:var(--green)}
+.verdict .vk.que{color:var(--accent)}
+.verdict .vk.rt{color:var(--blue)}
+.verdict .rtv{color:var(--blue)}
+.rtline{border-left:3px solid var(--blue);background:var(--blue-w);color:var(--ink);padding:7px 14px;border-radius:0 6px 6px 0;font-size:16.5px;line-height:1.4}
+.rtline b{color:var(--blue)}
+.slide .rtline+*{margin-top:12px}
+table.tbl td.num,table.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+table.tbl.lft td{text-align:left;white-space:normal}
+table.tbl tr.sota td{font-weight:700}
+.dots{letter-spacing:.08em;white-space:nowrap}
+.fr{font-family:var(--serif);font-style:italic;color:var(--muted)}
+.card .who{font-size:15px;line-height:1.45;color:var(--ink2)}
+.card .who b{color:var(--ink)}
+</style>
+</head>
+<body>
+<!-- Seven-minute report on three seminars followed in 2025-26. Sources:
+     ~/Downloads/Webinaire OCR - ILB Labs x Borelli x IRISA - Slides v251010.pdf (10 Oct 2025),
+     ~/Downloads/2026-03-26_DiegoBelzarena_Analyzing-Historical-Documents-Beyond-Text-Transcription (1).pdf,
+     https://demo.wleon.net/slides/prez_RDSC510_1.html (R. W. Leon, defense, RDSC510 progress assessment, 6 Oct 2026).
+     Figures in figures/ are crops of those slides (credited in each caption).
+     Speaker text is in aside.notes (press S); speaker_script.md is extracted from it. -->
+<div id="deck" data-foot="M. Wauquiez &mdash; three seminars &middot; report, November 2026" data-ui="en">
+
+<!-- ============ TITLE ============ -->
+<section class="slide dark nofoot">
+  <div class="titlebox">
+    <div class="over">Seminar report &middot; 7 minutes</div>
+    <h1>Reverse typography:<br>three seminars</h1>
+    <div class="sub">OCR in the age of VLMs, the printer behind a book, segmentation<br>
+      we can explain &mdash; read through a programme of our collaborators.</div>
+    <div class="who" style="display:flex;align-items:center;gap:20px">
+      <img src="sem_slides/assets/lingnan_logo.svg" alt="Lingnan University" style="width:66px;height:66px;flex:none">
+      <div>
+        Mathis Wauquiez
+        <div class="aff">Lingnan University</div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[0:00 &middot; 10 s] In seven minutes: three seminars I followed this year, mostly given by
+      collaborators, and read through one concept our collaborators introduced: reverse
+      typography.</p>
+  </aside>
+</section>
+
+<!-- ============ THE THREE SEMINARS ============ -->
+<section class="slide">
+  <div class="kicker">What I followed</div>
+  <h1>Three seminars, <span class="thin">one thread</span></h1>
+  <div class="body">
+    <div class="cards nogrow">
+      <div class="card sm fc-blue"><span class="tag">seminar &middot; 10 Oct 2025</span>
+        <h3>What is OCR really worth today?</h3>
+        <p class="fr xs">De la vision par ordinateur aux LLMs : que vaut vraiment l&rsquo;OCR aujourd&rsquo;hui ?</p>
+        <div class="who">ILB Data Lab &times; Centre Borelli &times; IRISA, one hour online.<br>
+          <b>S. Mowlavi, M. Gardella</b> (Centre Borelli)</div></div>
+      <div class="card sm fc-gold"><span class="tag">GTTI seminar &middot; 26 Mar 2026</span>
+        <h3>Analyzing historical documents beyond text transcription</h3>
+        <div class="who"><b>D. Belzarena</b>.<br>
+          <i>Comedias sueltas</i>: Spanish Golden-Age plays printed as cheap pamphlets.
+          Who printed them?</div></div>
+      <div class="card sm fc-green"><span class="tag">defense &middot; 6 Oct 2026</span>
+        <h3>Mathematical formalization of image segmentation</h3>
+        <div class="who"><b>R. W. Leon</b> (PhD, supervised by J.-M. Morel and Z. Liu).<br>
+          Train on data we fully specify, so we can explain what the model learns.</div></div>
+    </div>
+    <div class="note sm mt-l"><strong>Collaborators:</strong> Seginus Mowlavi and
+      Marina Gardella (Centre Borelli), and Diego Belzarena. For each
+      talk: what it does, one strength, one open question.</div>
+  </div>
+  <aside class="notes">
+    <p>[0:10 &middot; 30 s] First, a one-hour online seminar in October 2025, by the Louis Bachelier Data Lab,
+      Centre Borelli and IRISA: what is OCR really worth today? Two of its speakers, from Centre
+      Borelli, are collaborators. Second, Diego Belzarena on finding who printed a book. Third, Ruben
+      Leon&rsquo;s PhD defense, also under Jean-Michel Morel, on segmentation we can explain.
+      For each: a strength, an open question, and its place in one programme.</p>
+  </aside>
+</section>
+
+<!-- ============ REVERSE TYPOGRAPHY ============ -->
+<section class="slide" id="reverse-typography">
+  <div class="kicker">The frame &middot; introduced by our collaborators (J.-M. Morel&rsquo;s team)</div>
+  <h1>Reverse typography: <span class="thin">run the press backwards</span></h1>
+  <div class="body">
+    <div class="diagram">
+      <svg viewBox="-2 0 1140 214" style="width:100%;max-height:214px" font-size="19"
+           role="img" aria-label="Printing runs from font to sorts to composition to press and paper to scan; reverse typography runs it backwards; each seminar recovers one stage">
+        <defs>
+          <marker id="rt-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="rt-ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head acc" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+        <path class="edge" d="M40,16 L1096,16" marker-end="url(#rt-ah)"/>
+        <text class="lbl" x="568" y="11" text-anchor="middle" font-size="15">printing</text>
+        <g text-anchor="middle">
+          <rect class="box"      x="0"   y="30" width="180" height="56" rx="10"/><text class="t" x="90"  y="64">font</text>
+          <rect class="box"      x="239" y="30" width="180" height="56" rx="10"/><text class="t" x="329" y="64">metal sorts</text>
+          <rect class="box"      x="478" y="30" width="180" height="56" rx="10"/><text class="t" x="568" y="64">composition</text>
+          <rect class="box"      x="717" y="30" width="180" height="56" rx="10"/><text class="t" x="807" y="64">press, paper</text>
+          <rect class="box soft" x="956" y="30" width="180" height="56" rx="10"/><text class="t" x="1046" y="64">scan</text>
+        </g>
+        <path class="edge acc" d="M1096,106 L40,106" marker-end="url(#rt-ah-acc)"/>
+        <text class="acc" x="568" y="128" text-anchor="middle" font-size="16">reverse typography: shapes &rarr; recognition &rarr; a printable book</text>
+        <g text-anchor="middle" font-size="15">
+          <text class="lbl" x="90"   y="164">Mowlavi: clustering</text>
+          <text class="lbl" x="90"   y="184">Ocular, Typewriter</text>
+          <text class="lbl" x="329"  y="164">Belzarena:</text>
+          <text class="lbl" x="329"  y="184">damaged sorts</text>
+          <text class="lbl" x="568"  y="164">Belzarena: page layout</text>
+          <text class="lbl" x="568"  y="184">Ryskina: compositors</text>
+          <text class="lbl" x="807"  y="164">Belzarena:</text>
+          <text class="lbl" x="807"  y="184">paper, watermarks</text>
+          <text class="lbl" x="1046" y="164">Gardella:</text>
+          <text class="lbl" x="1046" y="184">scanner fringes</text>
+        </g>
+      </svg>
+    </div>
+    <div class="cols mt">
+      <div class="col"><div class="note sm"><strong>Definition.</strong> Extract the shapes of the
+        printed characters from scanned documents, recognise them, and restore them in a printable
+        form. <span class="src">J.-M. Morel, &ldquo;Reverse typography and the theory of shape: can old
+        books be brought back to life?&rdquo;, FAU MoD lecture, 19 Jun 2026.</span></div></div>
+      <div class="col"><ul class="b xs">
+        <li><strong>Why:</strong> a history of typography from the books themselves; old books
+          re-edited with their original appearance.</li>
+        <li><strong>How:</strong> the mathematical theory of planar shapes and its PDEs
+          &mdash; where Leon&rsquo;s Mumford&ndash;Shah formulation sits.</li>
+        <li>Transcription is one stage, not the goal.</li>
+      </ul></div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[0:40 &middot; 45 s] One concept ties these talks together, and it was introduced by our
+      collaborators, Jean-Michel Morel&rsquo;s team: reverse typography. Printing runs from a font, to
+      metal sorts, to a composed page, to ink on paper, to a scan. Reverse typography runs it backwards:
+      extract the shapes of the printed characters, recognise them, and restore them in printable form,
+      to write the history of typography from the books, and to re-edit old books as they looked.
+      Transcription is only one stage. Each talk today recovers one stage; Marina Gardella, for
+      instance, inverts the scan to spot pasted characters.</p>
+  </aside>
+</section>
+
+<!-- ============ I · OCR SEMINAR ============ -->
+<section class="slide" id="ocr-seminar" data-section="I &middot; OCR seminar">
+  <div class="kicker">Seminar &middot; S. Mowlavi (Centre Borelli)</div>
+  <h1>Learn the fonts of a corpus, <span class="thin">without labels</span></h1>
+  <div class="body">
+    <div class="note sm"><strong>Why it can work.</strong> In a printed book, every &ldquo;a&rdquo; comes
+      from a few metal sorts cast in one mould: the same shape, repeated hundreds of times. OCR trained
+      elsewhere fails on old prints, and annotating each book costs too much &mdash; so exploit the
+      repetition instead.</div>
+    <div class="diagram mt">
+      <svg viewBox="0 0 1136 262" style="width:100%;max-height:262px" font-size="18"
+           role="img" aria-label="Four steps: cut the page into characters and read them with an OCR; group the crops by the letter read; split a group when it holds two shapes; relabel the minority shape, which corrects OCR errors">
+        <defs><marker id="mw-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="head" d="M0,0 L10,5 L0,10 z"/></marker></defs>
+        <g text-anchor="middle">
+          <rect class="box soft" x="0"   y="0" width="250" height="40" rx="8"/><text class="t" x="125" y="27">1 &middot; cut and read</text>
+          <rect class="box soft" x="295" y="0" width="250" height="40" rx="8"/><text class="t" x="420" y="27">2 &middot; group by reading</text>
+          <rect class="box soft" x="590" y="0" width="250" height="40" rx="8"/><text class="t" x="715" y="27">3 &middot; split, refine</text>
+          <rect class="box acc"  x="885" y="0" width="250" height="40" rx="8"/><text class="t" x="1010" y="27">4 &middot; correct</text>
+          <text class="t" x="45" y="112" font-size="34" style="font-family:var(--serif)">o</text><text class="acc" x="85" y="112" font-size="34" style="font-family:var(--serif)">c</text><text class="t" x="125" y="112" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="165" y="112" font-size="34" style="font-family:var(--serif)">a</text><text class="t" x="205" y="112" font-size="34" style="font-family:var(--serif)">o</text>
+          <text class="lbl" x="45"  y="142" font-size="15">o</text><text class="acc" x="85" y="142" font-size="15">o</text>
+          <text class="lbl" x="125" y="142" font-size="15">o</text><text class="lbl" x="165" y="142" font-size="15">a</text>
+          <text class="lbl" x="205" y="142" font-size="15">o</text>
+          <text class="lbl" x="125" y="166" font-size="14">OCR reading (one error)</text>
+          <rect class="box" x="315" y="66" width="210" height="96" rx="14"/>
+          <text class="lbl" x="420" y="60" font-size="14">all crops read &ldquo;o&rdquo;</text>
+          <text class="t" x="345" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="385" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="acc" x="425" y="104" font-size="34" style="font-family:var(--serif)">c</text><text class="t" x="465" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="505" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="365" y="146" font-size="34" style="font-family:var(--serif)">o</text><text class="acc" x="405" y="146" font-size="34" style="font-family:var(--serif)">c</text><text class="t" x="445" y="146" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="485" y="146" font-size="34" style="font-family:var(--serif)">o</text>
+          <rect class="box" x="600" y="66" width="140" height="96" rx="14"/>
+          <rect class="box acc" x="756" y="66" width="74" height="96" rx="14"/>
+          <text class="t" x="625" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="670" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="715" y="104" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="645" y="146" font-size="34" style="font-family:var(--serif)">o</text><text class="t" x="690" y="146" font-size="34" style="font-family:var(--serif)">o</text><text class="acc" x="793" y="104" font-size="34" style="font-family:var(--serif)">c</text><text class="acc" x="793" y="146" font-size="34" style="font-family:var(--serif)">c</text>
+          <text class="lbl" x="715" y="60" font-size="14">two shapes: split</text>
+          <rect class="box acc" x="960" y="66" width="100" height="96" rx="14"/>
+          <text class="acc" x="1010" y="104" font-size="34" style="font-family:var(--serif)">c</text><text class="acc" x="1010" y="146" font-size="34" style="font-family:var(--serif)">c</text>
+          <text class="acc" x="1010" y="60" font-size="15">relabelled &ldquo;c&rdquo;</text>
+          <text class="lbl" x="125"  y="210" font-size="15">segment the page; an existing</text>
+          <text class="lbl" x="125"  y="230" font-size="15">OCR reads each character</text>
+          <text class="lbl" x="420"  y="210" font-size="15">one group per letter read:</text>
+          <text class="lbl" x="420"  y="230" font-size="15">its OCR errors hide inside</text>
+          <text class="lbl" x="715"  y="210" font-size="15">a statistical test on shapes;</text>
+          <text class="lbl" x="715"  y="230" font-size="15">repeat until each group is one shape</text>
+          <text class="lbl" x="1010" y="210" font-size="15">a sub-group matching another</text>
+          <text class="lbl" x="1010" y="230" font-size="15">letter is relabelled</text>
+        </g>
+        <path class="edge" d="M252,112 L290,112" marker-end="url(#mw-ah)"/>
+        <path class="edge" d="M547,112 L585,112" marker-end="url(#mw-ah)"/>
+        <path class="edge" d="M842,112 L880,112" marker-end="url(#mw-ah)"/>
+      </svg>
+    </div>
+    <div class="takeline sm">The result is the book&rsquo;s own font: one prototype per letter shape &mdash; the font stage of reverse typography.</div>
+  </div>
+  <aside class="notes">
+    <p>[2:45 &middot; 35 s] Seginus Mowlavi&rsquo;s idea: in a printed book, every letter comes from metal type cast in one
+      mould, so the same shape recurs hundreds of times. Instead of annotating, exploit that. Cut the
+      page into characters and let an existing OCR read them, errors included. Group the crops by the
+      letter read. Inside each group, compare shapes: if a statistical test says there are two, split,
+      and repeat. A sub-group of &ldquo;c&rdquo;s hiding among the &ldquo;o&rdquo;s is an OCR error:
+      relabel it.</p>
+  </aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Seminar &middot; S. Mowlavi (Centre Borelli)</div>
+  <h1>What the clusters give: <span class="thin">a book&rsquo;s own font</span></h1>
+  <div class="body">
+    <div class="cols narrow">
+      <div class="col">
+        <figure class="fig">
+          <img src="sem_slides/figures/mowlavi_split.png" alt="three histograms and a split tree from o to o and c" style="max-height:200px">
+          <figcaption>Two humps in a group&rsquo;s statistics (pink): two shapes, split. One hump: keep.
+            &ldquo;o&rdquo; splits into &ldquo;o&rdquo; and &ldquo;c&rdquo;, then into variants.
+            <span class="src">His slides; my reading of them.</span></figcaption>
+        </figure>
+      </div>
+      <div class="col">
+        <figure class="fig">
+          <img src="sem_slides/figures/mowlavi_editions.png" alt="two editions of a comedia and their letter prototypes" style="max-height:200px">
+          <figcaption>Two editions of one <i>comedia</i>, their letters side by side: the two fonts can
+            be compared. <span class="src">His slides.</span></figcaption>
+        </figure>
+      </div>
+      <div class="col mid">
+        <ul class="b xs">
+          <li><strong>OCR correction</strong> with no annotation: each group must agree.</li>
+          <li><strong>A model of the font</strong>: one prototype per letter shape.</li>
+          <li><strong>Philology</strong>: compare editions, letter by letter (the bridge to Belzarena).</li>
+          <li><strong>Forensics</strong>: a character that fits no group of its page is suspect.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="verdict">
+      <span class="vk pro">Strength</span><span>The redundancy of print is the only supervision, and a group can be looked at: an error is visible.</span>
+      <span class="vk que">Open question</span><span>When is a split a genuinely new type (another font, a broken sort) and not noise? How is a letter seen five times corrected?</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[3:20 &middot; 30 s] What comes out is the font of the book, one prototype per letter shape: the font stage of
+      reverse typography. It corrects the OCR without a single label. It lets you compare the fonts of
+      two editions, which is the bridge to Diego&rsquo;s work. And a character that fits no group is
+      suspicious. Question: when is a split a new type, a broken sort, rather than noise?</p>
+  </aside>
+</section>
+
+
+<!-- ============ II · BELZARENA ============ -->
+<!-- Source for the problem, method and results: D. Belzarena, S. Mowlavi, P. Casariego Castiñeira,
+     A. Ulla Lorenzo, G. Randall, J.-M. Morel, "Theatre Chapbooks At Scale: A Statistical Comparative
+     Analysis of Typography", arXiv:2607.27266 (2026); numbers checked against the PDF. -->
+<section class="slide" id="belzarena" data-section="II &middot; Belzarena">
+  <div class="kicker">GTTI seminar &middot; D. Belzarena &middot; the problem</div>
+  <h1>Who printed these plays? <span class="thin">The page must say</span></h1>
+  <div class="body">
+    <figure class="fig">
+      <img src="sem_slides/figures/belzarena_damaged_m.png" alt="the title M of five comedias sueltas, boxed in two colours" style="max-height:165px">
+      <figcaption>Title pages of five <i>sueltas</i>; colours group the same piece of type across books.
+        <span class="src">D. Belzarena&rsquo;s slides.</span></figcaption>
+    </figure>
+    <div class="cols narrow mt">
+      <div class="col">
+        <div class="finds">
+          <div class="find"><div class="q">40,952</div><div class="t">of the <b>78,524</b> volumes printed in
+            17th-c. Spain name no printer, often to evade legal controls. <i>Sueltas</i>: plays in quarto,
+            popular, short, on cheap paper.</div></div>
+          <div class="find"><div class="q">&asymp;&nbsp;5,000</div><div class="t">detailed pairwise comparisons an
+            expert would need for about 100 books.</div></div>
+        </div>
+      </div>
+      <div class="col">
+        <ul class="b xs">
+          <li><strong>Today, by hand</strong>: compare a book&rsquo;s typefaces, ornaments and page
+            layout with books of certain origin; build a network of typographic relations.</li>
+          <li><strong>The trap</strong>: same typeface &ne; same printer &mdash; type was traded and
+            shared between shops.</li>
+          <li><strong>Other clues</strong>: watermarks, spacing and spelling habits (Shakespeare&rsquo;s
+            First Folio), damaged sorts.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="rtline mt"><b>Reverse typography&rsquo;s question.</b> From the printed page back to the
+      metal type that printed it &mdash; and from the type to the print shop.</div>
+  </div>
+  <aside class="notes">
+    <p>[4:15 &middot; 40 s] Diego Belzarena&rsquo;s problem: in 17th-century Spain, more than half of all books name no
+      printer, often on purpose. Among them, the comedias sueltas: cheap, short pamphlets of plays.
+      Philologists identify them by hand, comparing typefaces and ornaments with books of known origin;
+      for a hundred books that is some five thousand comparisons. And same typeface does not mean same
+      printer: type was traded. This is reverse typography&rsquo;s question: from the page back to the
+      type, and from the type to the shop.</p>
+  </aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">GTTI seminar &middot; D. Belzarena &middot; the method</div>
+  <h1>Recover each book&rsquo;s type, <span class="thin">then count what differs</span></h1>
+  <div class="body">
+    <div class="rtline"><b>Reverse typography in practice.</b> Each book&rsquo;s letters are traced back to
+      the type that printed them: one prototype per piece of type. Books are then compared type by type,
+      not text by text.</div>
+    <div class="cols narrow">
+      <div class="col" style="flex:1.05">
+        <div class="steps xs">
+          <div class="step"><b>1</b> <strong>Find the characters</strong> (a CharNet detector) and sort
+            roman from italic by the slant of each word.</div>
+          <div class="step"><b>2</b> <strong>One prototype per type, per book</strong>: cluster the
+            book&rsquo;s characters and average each cluster &mdash; the clustering of Mowlavi&rsquo;s talk.</div>
+          <div class="step"><b>3</b> <strong>Compare two books letter by letter</strong>: align the two
+            prototypes of each letter, take their distance (the closest pair, since a book may own several
+            variants of a letter).</div>
+          <div class="step"><b>4</b> <strong>Count, a contrario, the letters that surely differ</strong>:
+            if the books shared their type, chance alone would make few distances large (a binomial law).
+            The smallest count compatible with it, at 0.01 false alarms over all pairs, is
+            <span class="m">n&#770;<sub>1</sub></span>; the share of differing letters links the books.</div>
+        </div>
+      </div>
+      <div class="col">
+        <figure class="fig">
+          <img src="sem_slides/figures/belzarena_approach.png" alt="(a) two books, (b) their characters, (c) clustered per book, (d) prototypes matched letter by letter" style="max-height:118px">
+          <figcaption>(a) books, (b) characters, (c) clusters per book, (d) prototypes matched by letter.</figcaption>
+        </figure>
+        <figure class="fig mt-s">
+          <img src="sem_slides/figures/belzarena_italics.png" alt="italic prototypes a d e i l n o r for 21 books" style="max-height:150px">
+          <figcaption>Italic prototypes, one column per book: books 0&ndash;7 share one italic (thin
+            &ldquo;o&rdquo;), 8&ndash;20 another. <span class="src">Belzarena, Mowlavi et al., 2026, fig.&nbsp;6.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[4:55 &middot; 35 s] The method is reverse typography in practice. Find every character; per book, cluster them and
+      average each cluster: one prototype per piece of type, the clustering we just saw with Seginus.
+      Then compare two books letter by letter, and count, a contrario, how many letters surely differ
+      &mdash; more than chance would allow if the books shared their type. Here, italic prototypes for
+      twenty-one books: look at the &ldquo;o&rdquo;, thin on the left, bold on the right.</p>
+  </aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">GTTI seminar &middot; D. Belzarena &middot; the results</div>
+  <h1>New attributions, <span class="thin">confirmed by experts</span></h1>
+  <div class="body">
+    <div class="cols narrow">
+      <div class="col" style="flex:1.05">
+        <figure class="fig">
+          <img src="sem_slides/figures/belzarena_graph.png" alt="similarity matrix and document graph, coloured by known printer" style="max-height:250px">
+          <figcaption>88 <i>sueltas</i> (BNE): books sharing type are linked; colours mark the 14 with a
+            known printer (Bedmar, Fajardo, Lyra, Pastrana, Sande). <span class="src">His slides.</span></figcaption>
+        </figure>
+      </div>
+      <div class="col mid">
+        <div class="finds">
+          <div class="find"><div class="q">0.99</div><div class="t">AUC for same- vs different-printer on
+            the 91 pairs of known books (roman 0.989, italic 0.997).</div></div>
+          <div class="find"><div class="q">book 51</div><div class="t">joins Fajardo&rsquo;s family; experts then
+            found shared layout, letterhead type and type damage.</div></div>
+          <div class="find"><div class="q">80, 81</div><div class="t">a new printing family, perhaps a century
+            apart from the others.</div></div>
+          <div class="find"><div class="q">6, 7</div><div class="t">moved from Lyra to Rodr&iacute;guez de
+            &Aacute;brego (their italic, a broken title type); two unattributed books placed.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="verdict">
+      <span class="vk pro">Strength</span><span>No training data, a statistical guarantee on every link, and output that experts check by the classical method: about 15 minutes per book instead of thousands of comparisons.</span>
+      <span class="vk que">Open question</span><span>Shared type is not a shared shop: what separates them beyond type (layout, ornaments, damage)? And with no ground truth beyond 14 books, how far does validation scale to the 623 sueltas already collected?</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[5:30 &middot; 35 s] It works: on the books whose printer is known, it separates same from different printers almost
+      perfectly. And it found new things, each then checked by experts the classical way: book 51 joins
+      Fajardo&rsquo;s family, two books form a new family, and two books filed under Lyra belong to
+      Rodr&iacute;guez de &Aacute;brego. Strength: about fifteen minutes per book, with guarantees.
+      Question: shared type is not a shared shop, and the next corpus has 623 books.</p>
+  </aside>
+</section>
+
+<!-- ============ III · LEON ============ -->
+<section class="slide" id="leon" data-section="III &middot; Leon">
+  <div class="kicker">Defense &middot; R. W. Leon &middot; 6 Oct 2026</div>
+  <h1>A great model <span class="thin">we cannot explain</span></h1>
+  <div class="body">
+    <div class="cols">
+      <div class="col" style="flex:1.1">
+        <figure class="fig">
+          <img src="sem_slides/figures/leon_brodatz.png" alt="a patchwork of 14 Brodatz textures and SAM's masks, missed textures in grey" style="max-height:300px">
+          <figcaption>14 Brodatz textures, exact boundaries; SAM&rsquo;s masks, grey = missed:
+            4 of 14 textures get none. <span class="src">R. W. Leon&rsquo;s slides.</span></figcaption>
+        </figure>
+      </div>
+      <div class="col mid">
+        <ul class="b xs">
+          <li><strong>SAM</strong>: 11M images, 1.1B masks &mdash; but natural photos come with no
+            specification, so its failures can be neither explained nor fixed through the data.</li>
+          <li><strong>Before deep learning</strong>, a segmentation minimised an explicit energy
+            (Mumford&ndash;Shah), whose existence and regularity can be proved:
+            \(E(\mathrm{Seg}) = \sum_{R} \mathrm{var}(g,R) + \mu\,\mathrm{length}(\partial R)\).</li>
+          <li><strong>Question</strong>: do segmentation networks learn <em>objects</em>, or low-level
+            features &mdash; colour, texture, geometry?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[6:05 &middot; 30 s] Ruben Leon&rsquo;s PhD defense asks how to study a model whose data cannot be described. SAM,
+      trained on a billion masks, misses four of fourteen textures in a simple patchwork, and nothing in
+      its data says why. Before deep learning, a segmentation minimised an explicit energy,
+      Mumford&ndash;Shah, whose properties can be proved. His question: do networks learn objects, or
+      low-level features?</p>
+  </aside>
+</section>
+
+<section class="slide">
+  <div class="kicker">Defense &middot; R. W. Leon &middot; 6 Oct 2026</div>
+  <h1>Specify the data, <span class="thin">explain the model</span></h1>
+  <div class="body">
+    <div class="rtline"><b>For reverse typography,</b> the shape stage: segmentation defined by an
+      explicit energy, learned where the truth is exact &mdash; a glyph generator would run the same
+      experiment on print.</div>
+    <div class="cols narrow">
+      <div class="col" style="flex:0.9">
+        <figure class="fig">
+          <img src="sem_slides/figures/leon_generator.png" alt="a generated dead-leaves image and its exact ground truth" style="max-height:200px">
+          <figcaption>Each image is a seed plus recorded variables: scene, shape, colour, texture,
+            acquisition. <span class="src">R. W. Leon&rsquo;s slides.</span></figcaption>
+        </figure>
+      </div>
+      <div class="col mid">
+        <table class="tbl lft xs">
+          <thead><tr><th>step</th><th>what</th><th>status</th></tr></thead>
+          <tbody>
+            <tr><td>generator</td><td>dead leaves (from VibrantLeaves), real Brodatz / ALOT textures, difficulty presets</td><td>done</td></tr>
+            <tr><td>Abstract SAM</td><td>encoder from scratch, prompt-free decoder, boundary + Mumford&ndash;Shah-like loss</td><td>running</td></tr>
+            <tr><td>benchmark</td><td>levels L1&ndash;L5, up to natural images; SAM in automatic mode</td><td>planned</td></tr>
+            <tr><td>explain</td><td>one variable at a time, ablations, the same tests on SAM</td><td>planned</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="verdict">
+      <span class="vk pro">Strength</span><span>An observational study turned into a controlled experiment: every error traces to a variable, and he names the bias of his own evaluation (SAM given oracle prompts).</span>
+      <span class="vk que">Open question</span><span>External validity (level L5): will a model trained on leaves segment real images? No results yet to judge.</span>
+    </div>
+  </div>
+  <aside class="notes">
+    <p>[6:35 &middot; 35 s] His answer: specify the data. A generator of dead-leaves images where each image is a seed and
+      a list of variables, so any error traces to a variable. He trains an Abstract SAM from scratch,
+      without prompts, with Mumford&ndash;Shah-like terms in the loss, and plans a graded benchmark up to
+      natural images. For reverse typography, this is the shape stage. Strength: a controlled
+      experiment. Question, his own: external validity; there are no results yet.</p>
+  </aside>
+</section>
+
+<!-- ============ SYNTHESIS ============ -->
+<section class="slide" id="synthesis" data-section="Synthesis">
+  <div class="kicker">Synthesis</div>
+  <h1>What recurs, <span class="thin">and what stays open</span></h1>
+  <div class="body">
+    <div class="cards">
+      <div class="card fc-green"><span class="tag">strengths</span>
+        <ul class="b small">
+          <li><strong>Reverse typography</strong>: model how the page was printed and invert it,
+            stage by stage. Results can be checked.</li>
+          <li><strong>Frugal supervision</strong>: redundancy, rules or synthesis replace most
+            annotation.</li>
+          <li><strong>Explanations, not only scores</strong>: grammars, clusters,
+            explicit energies and graphs one can inspect.</li>
+        </ul></div>
+      <div class="card fc-accent"><span class="tag">open questions</span>
+        <ul class="b small">
+          <li><strong>Evaluation</strong>: test sets seen in training, results still to come.</li>
+          <li><strong>Transfer</strong>: a new grammar per collection; from leaves to real
+            images.</li>
+          <li><strong>What counts as an error</strong>: pixel or partition.</li>
+          <li><strong>One inversion</strong>: font, sorts and scan recovered jointly, to check what a
+            fluent VLM reads.</li>
+        </ul></div>
+    </div>
+    <div class="takeline sm">Reverse typography: when labels are scarce, invert how the page was printed.</div>
+  </div>
+  <aside class="notes">
+    <p>[7:10 &middot; 35 s] Three strengths recur. First, reverse typography: each talk inverts one
+      stage of printing, so results can be checked; they replace annotation by redundancy, rules or
+      synthesis; and they explain, rather than only score. Four questions recur too: evaluation on
+      contaminated or tiny test sets; transfer to new collections and real images; what counts as an
+      error; and whether the stages can be inverted together, to check what a fluent VLM reads. Thank you.</p>
+  </aside>
+</section>
+
+<!-- ============ QUESTIONS ============ -->
+<section class="slide dark nofoot" id="questions">
+  <div class="titlebox">
+    <div class="over">Thank you</div>
+    <h1>Questions?</h1>
+    <div class="sub" style="margin-bottom:0">Reverse typography: from the printed page back to the type,<br>
+      the press and the print shop.</div>
+  </div>
+</section>
+
+<!-- ============ APPENDIX ============ -->
+<section class="slide dark appendix" id="appendix" data-section="Appendix">
+  <div class="titlebox">
+    <div class="over">Backup</div>
+    <h1>Appendix</h1>
+    <div class="sub" style="margin-bottom:0">For questions. Not counted in the seven minutes.</div>
+  </div>
+</section>
+
+<section class="slide appendix">
+  <div class="kicker">Backup</div>
+  <h1>Echoes in my own work</h1>
+  <div class="body">
+    <table class="tbl lft">
+      <thead><tr><th>seminar</th><th>idea</th><th>in my project (historical Chinese prints, TKH)</th></tr></thead>
+      <tbody>
+        <tr><td>Mowlavi</td><td>cluster characters, correct by agreement</td><td>a k-NN graph over every glyph; labels corrected by diffusion on it</td></tr>
+        <tr><td>Gardella</td><td>a contrario NFA</td><td>graph edges kept by an a contrario test on glyph distances</td></tr>
+        <tr><td>Belzarena</td><td>Learnable Typewriter</td><td>ported, trained on TKH: test CER 1.44&nbsp;% vs 8.87&nbsp;% for CHAT; characters seen &lt;&nbsp;5 times are never read</td></tr>
+        <tr><td>Leon</td><td>specified synthetic data</td><td>glyph boxes from CRAFT refined by the SAM&nbsp;3 tracker; a font-rendered generator would make glyph segmentation a controlled experiment</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide appendix">
+  <div class="kicker">Backup</div>
+  <h1>References <span class="thin">cited in the seminars, and the frame</span></h1>
+  <div class="body">
+    <ol class="refs">
+      <li>T. Berg-Kirkpatrick et al. <span class="ti">Unsupervised Transcription of Historical Documents.</span> <span class="ve">2013.</span></li>
+      <li>T. Berg-Kirkpatrick et al. <span class="ti">Improved Typesetting Models for Historical OCR.</span> <span class="ve">2014.</span></li>
+      <li>M. Ryskina et al. <span class="ti">Automatic Compositor Attribution in the First Folio of Shakespeare.</span> <span class="ve">2017.</span></li>
+      <li>N. Vogler et al. <span class="ti">Contrastive Attention Networks for Attribution of Early Modern Print.</span> <span class="ve">2023.</span></li>
+      <li>I. Siglidis et al. <span class="ti">The Learnable Typewriter: A Generative Approach to Text Analysis.</span> <span class="ve">2024.</span></li>
+      <li>D. Belzarena, S. Mowlavi, P. Casariego Casti&ntilde;eira, A. Ulla Lorenzo, G. Randall, J.-M. Morel.
+        <span class="ti">Theatre Chapbooks At Scale: A Statistical Comparative Analysis of Typography.</span>
+        <span class="ve">arXiv:2607.27266, 2026.</span></li>
+      <li>J.-M. Morel. <span class="ti">Reverse typography and the theory of shape: can old books be brought back to life?</span> <span class="ve">FAU MoD lecture, 19 Jun 2026.</span></li>
+    </ol>
+    <div class="note sm mt-l">Also named, without a reference list: SAM, Mumford&ndash;Shah, VibrantLeaves, Brodatz and ALOT textures (Leon).</div>
+  </div>
+</section>
+
+</div>
+
+<script src="sem_slides/assets/katex/katex.min.js"></script>
+<script src="sem_slides/assets/katex/contrib/auto-render.min.js"></script>
+<script src="sem_slides/assets/deck.js"></script>
+</body>
+</html>
