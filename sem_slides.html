@@ -157,7 +157,7 @@ table.tbl tr.sota td{font-weight:700}
 </section>
 
 <!-- ============ I · OCR SEMINAR ============ -->
-<section class="slide" id="ocr-seminar" data-section="I &middot; OCR seminar">
+<section class="slide" id="ocr-seminar" data-section="I &middot; Mowlavi">
   <div class="kicker">Seminar &middot; S. Mowlavi (Centre Borelli)</div>
   <h1>Learn the fonts of a corpus, <span class="thin">without labels</span></h1>
   <div class="body">
@@ -206,7 +206,7 @@ table.tbl tr.sota td{font-weight:700}
     <div class="takeline sm">The result is the book&rsquo;s own font: one prototype per letter shape &mdash; the font stage of reverse typography.</div>
   </div>
   <aside class="notes">
-    <p>[2:45 &middot; 35 s] Seginus Mowlavi&rsquo;s idea: in a printed book, every letter comes from metal type cast in one
+    <p>[1:25 &middot; 35 s] Seginus Mowlavi&rsquo;s idea: in a printed book, every letter comes from metal type cast in one
       mould, so the same shape recurs hundreds of times. Instead of annotating, exploit that. Cut the
       page into characters and let an existing OCR read them, errors included. Group the crops by the
       letter read. Inside each group, compare shapes: if a statistical test says there are two, split,
@@ -250,7 +250,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[3:20 &middot; 30 s] What comes out is the font of the book, one prototype per letter shape: the font stage of
+    <p>[2:00 &middot; 30 s] What comes out is the font of the book, one prototype per letter shape: the font stage of
       reverse typography. It corrects the OCR without a single label. It lets you compare the fonts of
       two editions, which is the bridge to Diego&rsquo;s work. And a character that fits no group is
       suspicious. Question: when is a split a new type, a broken sort, rather than noise?</p>
@@ -296,7 +296,7 @@ table.tbl tr.sota td{font-weight:700}
       metal type that printed it &mdash; and from the type to the print shop.</div>
   </div>
   <aside class="notes">
-    <p>[4:15 &middot; 40 s] Diego Belzarena&rsquo;s problem: in 17th-century Spain, more than half of all books name no
+    <p>[2:30 &middot; 40 s] Diego Belzarena&rsquo;s problem: in 17th-century Spain, more than half of all books name no
       printer, often on purpose. Among them, the comedias sueltas: cheap, short pamphlets of plays.
       Philologists identify them by hand, comparing typefaces and ornaments with books of known origin;
       for a hundred books that is some five thousand comparisons. And same typeface does not mean same
@@ -342,7 +342,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[4:55 &middot; 35 s] The method is reverse typography in practice. Find every character; per book, cluster them and
+    <p>[3:10 &middot; 35 s] The method is reverse typography in practice. Find every character; per book, cluster them and
       average each cluster: one prototype per piece of type, the clustering we just saw with Seginus.
       Then compare two books letter by letter, and count, a contrario, how many letters surely differ
       &mdash; more than chance would allow if the books shared their type. Here, italic prototypes for
@@ -381,7 +381,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[5:30 &middot; 35 s] It works: on the books whose printer is known, it separates same from different printers almost
+    <p>[3:45 &middot; 35 s] It works: on the books whose printer is known, it separates same from different printers almost
       perfectly. And it found new things, each then checked by experts the classical way: book 51 joins
       Fajardo&rsquo;s family, two books form a new family, and two books filed under Lyra belong to
       Rodr&iacute;guez de &Aacute;brego. Strength: about fifteen minutes per book, with guarantees.
@@ -416,7 +416,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[6:05 &middot; 30 s] Ruben Leon&rsquo;s PhD defense asks how to study a model whose data cannot be described. SAM,
+    <p>[4:20 &middot; 30 s] Ruben Leon&rsquo;s PhD defense asks how to study a model whose data cannot be described. SAM,
       trained on a billion masks, misses four of fourteen textures in a simple patchwork, and nothing in
       its data says why. Before deep learning, a segmentation minimised an explicit energy,
       Mumford&ndash;Shah, whose properties can be proved. His question: do networks learn objects, or
@@ -457,7 +457,7 @@ table.tbl tr.sota td{font-weight:700}
     </div>
   </div>
   <aside class="notes">
-    <p>[6:35 &middot; 35 s] His answer: specify the data. A generator of dead-leaves images where each image is a seed and
+    <p>[4:50 &middot; 35 s] His answer: specify the data. A generator of dead-leaves images where each image is a seed and
       a list of variables, so any error traces to a variable. He trains an Abstract SAM from scratch,
       without prompts, with Mumford&ndash;Shah-like terms in the loss, and plans a graded benchmark up to
       natural images. For reverse typography, this is the shape stage. Strength: a controlled
@@ -473,31 +473,34 @@ table.tbl tr.sota td{font-weight:700}
     <div class="cards">
       <div class="card fc-green"><span class="tag">strengths</span>
         <ul class="b small">
-          <li><strong>Reverse typography</strong>: model how the page was printed and invert it,
-            stage by stage. Results can be checked.</li>
-          <li><strong>Frugal supervision</strong>: redundancy, rules or synthesis replace most
-            annotation.</li>
-          <li><strong>Explanations, not only scores</strong>: grammars, clusters,
-            explicit energies and graphs one can inspect.</li>
+          <li><strong>Reverse typography</strong>: each talk inverts one stage of printing &mdash; the
+            font (Mowlavi), the type and the shop (Belzarena), the shape (Leon). Results can be checked.</li>
+          <li><strong>Frugal supervision</strong>: a book&rsquo;s own redundancy, or fully specified
+            synthetic data, replaces annotation.</li>
+          <li><strong>Explanations, not only scores</strong>: clusters one can look at, an a contrario
+            guarantee on every link, an explicit energy.</li>
         </ul></div>
       <div class="card fc-accent"><span class="tag">open questions</span>
         <ul class="b small">
-          <li><strong>Evaluation</strong>: test sets seen in training, results still to come.</li>
-          <li><strong>Transfer</strong>: a new grammar per collection; from leaves to real
-            images.</li>
-          <li><strong>What counts as an error</strong>: pixel or partition.</li>
-          <li><strong>One inversion</strong>: font, sorts and scan recovered jointly, to check what a
+          <li><strong>Validation</strong>: only 14 books with a known printer; no results yet for the
+            segmentation model.</li>
+          <li><strong>Transfer</strong>: from 88 to 623 <i>sueltas</i>; from leaves to real images,
+            and to glyphs.</li>
+          <li><strong>What a difference means</strong>: another printer, another piece of type, or
+            noise?</li>
+          <li><strong>One inversion</strong>: font, type and scan recovered jointly, to check what a
             fluent VLM reads.</li>
         </ul></div>
     </div>
     <div class="takeline sm">Reverse typography: when labels are scarce, invert how the page was printed.</div>
   </div>
   <aside class="notes">
-    <p>[7:10 &middot; 35 s] Three strengths recur. First, reverse typography: each talk inverts one
-      stage of printing, so results can be checked; they replace annotation by redundancy, rules or
-      synthesis; and they explain, rather than only score. Four questions recur too: evaluation on
-      contaminated or tiny test sets; transfer to new collections and real images; what counts as an
-      error; and whether the stages can be inverted together, to check what a fluent VLM reads. Thank you.</p>
+    <p>[5:25 &middot; 40 s] Three strengths recur. First, reverse typography: each talk inverts one stage of printing,
+      the font, the type and shop, the shape, so results can be checked. Second, no annotation: the
+      book&rsquo;s own redundancy, or synthetic data we fully specify. Third, they explain rather than
+      only score. Open questions: validation on very few known cases; transfer to larger corpora and real
+      images; what a difference means, another printer, another sort, or noise; and whether all stages
+      can be inverted together, to check what a fluent VLM reads.</p>
   </aside>
 </section>
 
